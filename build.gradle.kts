@@ -23,10 +23,12 @@ dependencies {
     testImplementation(kotlin("test"))
 }
 
-tasks.test {
-    useJUnitPlatform()
-}
-
-tasks.withType<KotlinCompile>() {
-    kotlinOptions.jvmTarget = "13"
+tasks {
+    withType<KotlinCompile>().configureEach {
+        kotlinOptions.freeCompilerArgs = listOf("-Xjsr305=strict")
+        kotlinOptions.jvmTarget = "11"
+    }
+    test {
+        useJUnitPlatform()
+    }
 }
