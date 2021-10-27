@@ -2,8 +2,10 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     val kotlinVersion = "1.5.31"
+    val shadowVersion = "7.1.0"
 
     kotlin("jvm") version kotlinVersion
+    id("com.github.johnrengelman.shadow") version shadowVersion
 }
 
 group = "com.github.ball"
@@ -30,5 +32,10 @@ tasks {
     }
     test {
         useJUnitPlatform()
+    }
+    shadowJar {
+        manifest {
+            attributes(Pair("Main-Class", "com.github.ball.ballbot.BallBotKt"))
+        }
     }
 }
