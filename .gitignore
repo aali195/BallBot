@@ -1,3 +1,6 @@
+### CUSTOM ###
+src/main/resources/token
+
 ### VisualStudioCode template
 .vscode/*
 !.vscode/settings.json

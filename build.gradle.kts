@@ -13,7 +13,13 @@ repositories {
     mavenCentral()
 }
 
+val kordVersion = "0.8.0-M7"
+val slf4jSimpleVersion = "1.7.32"
+
 dependencies {
+    implementation("dev.kord:kord-core:$kordVersion")
+    implementation("org.slf4j:slf4j-simple:$slf4jSimpleVersion")
+
     testImplementation(kotlin("test"))
 }
 
