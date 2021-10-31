@@ -6,7 +6,7 @@ import dev.minn.jda.ktx.listener
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import java.io.File
 
-private val TOKEN = File("src/main/resources/token").readText()
+private val TOKEN = File("token").readText().trim()
 
 fun main() {
 
