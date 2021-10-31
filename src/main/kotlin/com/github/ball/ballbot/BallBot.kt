@@ -1,28 +1,24 @@
 package com.github.ball.ballbot
 
-import dev.kord.core.Kord
-import dev.kord.core.event.message.MessageCreateEvent
-import dev.kord.core.on
+import dev.minn.jda.ktx.await
+import dev.minn.jda.ktx.light
+import dev.minn.jda.ktx.listener
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import java.io.File
 
-private val TOKEN = File("src/main/resources/token").readText()
+private val TOKEN = File("token").readText().trim()
 
-suspend fun main() {
+fun main() {
 
-    val api = Kord(TOKEN)
+    val jda = light(TOKEN)
 
-    api.on<MessageCreateEvent> {
-        if (message.author?.isBot != false) return@on
-        if (message.content == "${COMMAND_PREFIX}markov") asPingPongCommand()
-        return@on
+    jda.listener<MessageReceivedEvent> {
+        if (it.message.contentDisplay == "${COMMAND_PREFIX}markov") {
+            it.channel.sendTyping().await()
+            it.message.reply("ded...").queue()
+        }
     }
-
-    api.login()
 
 }
 
 private const val COMMAND_PREFIX = "!"
-
-private suspend fun MessageCreateEvent.asPingPongCommand() = message
-    .channel
-    .createMessage("ded :thinking:")

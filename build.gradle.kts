@@ -13,13 +13,23 @@ version = "0.0.1"
 
 repositories {
     mavenCentral()
+    maven("https://m2.dv8tion.net/releases")
+    maven("https://jitpack.io/")
 }
 
-val kordVersion = "0.8.0-M7"
+val kotlinxCoroutinesVersion = "1.5.2"
+val jdaKtxVersion = "1223d5cbb8a8caac6d28799a36001f1844d7aa7d"
+val jdaVersion = "4.3.0_277"
+val kotlinLoggingVersion = "2.0.11"
 val slf4jSimpleVersion = "1.7.32"
 
 dependencies {
-    implementation("dev.kord:kord-core:$kordVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion")
+
+    implementation("net.dv8tion:JDA:$jdaVersion")
+    implementation("com.github.minndevelopment:jda-ktx:$jdaKtxVersion")
+
+    implementation("io.github.microutils:kotlin-logging-jvm:$kotlinLoggingVersion")
     implementation("org.slf4j:slf4j-simple:$slf4jSimpleVersion")
 
     testImplementation(kotlin("test"))
