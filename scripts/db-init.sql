@@ -1,5 +1,5 @@
 -- Execute (copy and paste) as the "postgres" user (or a superuser), ie `docker-compose exec -u postgres postgres psql`
---
+-- Remember to change to match what you have in the `db.properties` config!
 
 DO
 $do$

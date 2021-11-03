@@ -1,24 +1,17 @@
 package com.github.ball.ballbot
 
-import dev.minn.jda.ktx.await
+import com.github.ball.ballbot.handlers.EventHandler
 import dev.minn.jda.ktx.light
-import dev.minn.jda.ktx.listener
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent
+import net.dv8tion.jda.api.entities.Activity
 import java.io.File
-
-private val TOKEN = File("token").readText().trim()
 
 fun main() {
 
-    val jda = light(TOKEN)
+    val token = File("token").readText().trim()
 
-    jda.listener<MessageReceivedEvent> {
-        if (it.message.contentDisplay == "${COMMAND_PREFIX}markov") {
-            it.channel.sendTyping().await()
-            it.message.reply("ded...").queue()
-        }
+    light(token) {
+        setActivity(Activity.watching("this server"))
+        addEventListeners(EventHandler)
     }
 
 }
-
-private const val COMMAND_PREFIX = "!"

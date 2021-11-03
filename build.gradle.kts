@@ -1,4 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.io.FileInputStream
+import java.util.*
 
 plugins {
     val kotlinVersion = "1.5.31"
@@ -26,8 +28,9 @@ val jdaKtxVersion = "1223d5cbb8a8caac6d28799a36001f1844d7aa7d"
 val jdaVersion = "4.3.0_277"
 val jacksonKotlinVersion = "2.13.0"
 val postgresqlJdbcVersion = "42.3.1"
-val jooqVersion = "3.15.4"
 val flywayVersion = "8.0.2"
+val hikariVersion = "5.0.0"
+val jooqVersion = "3.15.4"
 val kotlinLoggingVersion = "2.0.11"
 val slf4jSimpleVersion = "1.7.32"
 
@@ -41,6 +44,7 @@ dependencies {
 
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonKotlinVersion")
     implementation("org.flywaydb:flyway-core:$flywayVersion")
+    implementation("com.zaxxer:HikariCP:$hikariVersion")
     implementation("org.jooq:jooq-meta:$jooqVersion")
     implementation("org.postgresql:postgresql:$postgresqlJdbcVersion")
 
@@ -52,18 +56,16 @@ dependencies {
 
 val mainPackage = "com.github.ball.ballbot"
 
-val dbDriver = "org.postgresql.Driver"
-val dbUrl = "jdbc:postgresql://localhost:5432/ballbot_db"
-val dbUser = "ballbot"
-val dbPassword = "toor"
-val dbSchema = "ballbot_schema"
+val dbProperties = Properties().apply {
+    load(FileInputStream(File(rootProject.rootDir, "db.properties")))
+}
 
 flyway {
-    driver = dbDriver
-    url = dbUrl
-    user = dbUser
-    password = dbPassword
-    schemas = arrayOf(dbSchema)
+    driver = dbProperties.getProperty("dbDriver")
+    url = dbProperties.getProperty("dbUrl")
+    user = dbProperties.getProperty("dbUser")
+    password = dbProperties.getProperty("dbPassword")
+    schemas = arrayOf(dbProperties.getProperty("dbSchema"))
 }
 
 jooq {
@@ -75,10 +77,10 @@ jooq {
             jooqConfiguration.apply {
                 logging = org.jooq.meta.jaxb.Logging.WARN
                 jdbc.apply {
-                    driver = dbDriver
-                    url = dbUrl
-                    user = dbUser
-                    password = dbPassword
+                    driver = dbProperties.getProperty("dbDriver")
+                    url = dbProperties.getProperty("dbUrl")
+                    user = dbProperties.getProperty("dbUser")
+                    password = dbProperties.getProperty("dbPassword")
                 }
                 generator.apply {
                     name = "org.jooq.codegen.KotlinGenerator"
@@ -101,7 +103,7 @@ jooq {
                             "raster_overviews",
                             "spatial_ref_sys"
                         ).joinToString(separator = "|")
-                        inputSchema = dbSchema
+                        inputSchema = dbProperties.getProperty("dbSchema")
                         isTableValuedFunctions = false
                         isIncludeRoutines = false
                     }

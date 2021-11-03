@@ -77,7 +77,7 @@ open class Guild(
     /**
      * The column <code>ballbot_schema.guild.prefix</code>.
      */
-    val PREFIX: TableField<GuildRecord, String?> = createField(DSL.name("prefix"), SQLDataType.CLOB, this, "")
+    val PREFIX: TableField<GuildRecord, String?> = createField(DSL.name("prefix"), SQLDataType.CLOB.nullable(false), this, "")
 
     private constructor(alias: Name, aliased: Table<GuildRecord>?): this(alias, null, null, aliased, null)
     private constructor(alias: Name, aliased: Table<GuildRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, aliased, parameters)

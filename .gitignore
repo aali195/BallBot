@@ -129,3 +129,4 @@ gradle-app.setting
 
 ### CUSTOM ###
 token
+db.properties
