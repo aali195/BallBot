@@ -14,9 +14,9 @@ interface GuildRepository {
     fun updateGuildPrefix(guildId: String, updatedPrefix: String): Int
 }
 
-class GuildRepositoryImpl(
+object GuildRepositoryImpl : GuildRepository {
+
     private val dslContext: DSLContext = DslConfig.dslContext
-) : GuildRepository {
 
     override fun getGuildIdToPrefixMap(): Map<String?, String?> = GUILD
         .runCatching {

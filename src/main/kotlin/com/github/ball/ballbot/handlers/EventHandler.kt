@@ -1,5 +1,6 @@
 package com.github.ball.ballbot.handlers
 
+import com.github.ball.ballbot.commands.CommandContext
 import com.github.ball.ballbot.repository.GuildRepository
 import com.github.ball.ballbot.repository.GuildRepositoryImpl
 import net.dv8tion.jda.api.events.ReadyEvent
@@ -9,7 +10,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter
 
 object EventHandler : ListenerAdapter() {
 
-    private val guildRepo: GuildRepository = GuildRepositoryImpl()
+    private val guildRepo: GuildRepository = GuildRepositoryImpl
 
     private lateinit var prefixes: Map<String?, String?>
 
@@ -23,34 +24,28 @@ object EventHandler : ListenerAdapter() {
     }
 
     override fun onGuildMessageReceived(event: GuildMessageReceivedEvent) {
-        if (event.author.isBot) return
-
-        val guildPrefix = prefixes[event.guild.id] ?: DEFAULT_COMMAND_PREFIX
-        if (!event.message.contentRaw.startsWith(guildPrefix)) return
-
-        val commandString = event.message.contentDisplay.removePrefix(guildPrefix)
-
-        // TODO: Write an actual command handler
-        if (commandString == "markov") {
-            event.channel.sendTyping()
-            event.message.reply("ded...").queue()
-        }
-        if (commandString.startsWith("prefix")) {
-            val newPrefix = commandString.split(" ").getOrNull(1)
-            if (newPrefix != null) {
-                guildRepo.updateGuildPrefix(event.guild.id, newPrefix)
-                event.message.reply("set server prefix: $newPrefix").queue()
-                updatePrefixMap()
-            } else {
-                event.message.reply("its: `[current_prefix]prefix [new_prefix]`").queue()
-            }
-        }
+        event.guild.id
+            .let { prefixes[it] ?: DEFAULT_COMMAND_PREFIX }
+            .takeUnless { event.isInvalid(it) }
+            ?.run { CommandHandler(event.asCommandContext(this)) }
     }
 
-    private fun updatePrefixMap() {
+    internal fun updatePrefixMap() {
         prefixes = guildRepo.getGuildIdToPrefixMap()
     }
 
 }
+
+private fun GuildMessageReceivedEvent.isInvalid(guildPrefix: String): Boolean =
+    author.isBot && !message.contentRaw.startsWith(guildPrefix)
+
+private fun GuildMessageReceivedEvent.asCommandContext(guildPrefix: String) = CommandContext(
+    channel = channel,
+    message = message,
+    guild = guild,
+    member = member,
+    author = author,
+    prefix = guildPrefix
+)
 
 private const val DEFAULT_COMMAND_PREFIX = "!"
