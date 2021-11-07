@@ -6,7 +6,6 @@ import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.TextChannel
 import net.dv8tion.jda.api.entities.User
 
-
 abstract class Command {
 
     abstract val command: String

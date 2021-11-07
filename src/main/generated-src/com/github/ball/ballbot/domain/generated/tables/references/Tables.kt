@@ -5,6 +5,7 @@ package com.github.ball.ballbot.domain.generated.tables.references
 
 
 import com.github.ball.ballbot.domain.generated.tables.Guild
+import com.github.ball.ballbot.domain.generated.tables.Picture
 
 
 
@@ -12,3 +13,8 @@ import com.github.ball.ballbot.domain.generated.tables.Guild
  * The table <code>ballbot_schema.guild</code>.
  */
 val GUILD: Guild = Guild.GUILD
+
+/**
+ * The table <code>ballbot_schema.picture</code>.
+ */
+val PICTURE: Picture = Picture.PICTURE

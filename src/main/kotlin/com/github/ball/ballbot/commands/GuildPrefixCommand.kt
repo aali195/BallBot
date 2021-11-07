@@ -16,9 +16,7 @@ object GuildPrefixCommand : Command() {
             guildRepo.updateGuildPrefix(guild.id, newPrefix)
             message.reply("set server prefix: $newPrefix").queue()
             EventHandler.updatePrefixMap()
-        } else {
-            message.reply("its: $usage").queue()
-        }
+        } else message.reply("its: $usage").queue()
     }
 
     override val description: String = """

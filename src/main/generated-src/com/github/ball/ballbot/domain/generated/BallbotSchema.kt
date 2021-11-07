@@ -5,6 +5,7 @@ package com.github.ball.ballbot.domain.generated
 
 
 import com.github.ball.ballbot.domain.generated.tables.Guild
+import com.github.ball.ballbot.domain.generated.tables.Picture
 
 import kotlin.collections.List
 
@@ -31,9 +32,15 @@ open class BallbotSchema : SchemaImpl("ballbot_schema", DefaultCatalog.DEFAULT_C
      */
     val GUILD: Guild get() = Guild.GUILD
 
+    /**
+     * The table <code>ballbot_schema.picture</code>.
+     */
+    val PICTURE: Picture get() = Picture.PICTURE
+
     override fun getCatalog(): Catalog = DefaultCatalog.DEFAULT_CATALOG
 
     override fun getTables(): List<Table<*>> = listOf(
-        Guild.GUILD
+        Guild.GUILD,
+        Picture.PICTURE
     )
 }

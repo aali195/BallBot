@@ -5,8 +5,11 @@ package com.github.ball.ballbot.domain.generated.keys
 
 
 import com.github.ball.ballbot.domain.generated.tables.Guild
+import com.github.ball.ballbot.domain.generated.tables.Picture
 import com.github.ball.ballbot.domain.generated.tables.records.GuildRecord
+import com.github.ball.ballbot.domain.generated.tables.records.PictureRecord
 
+import org.jooq.ForeignKey
 import org.jooq.UniqueKey
 import org.jooq.impl.DSL
 import org.jooq.impl.Internal
@@ -18,3 +21,10 @@ import org.jooq.impl.Internal
 // -------------------------------------------------------------------------
 
 val GUILD_PKEY: UniqueKey<GuildRecord> = Internal.createUniqueKey(Guild.GUILD, DSL.name("guild_pkey"), arrayOf(Guild.GUILD.ID), true)
+val PICTURE_PKEY: UniqueKey<PictureRecord> = Internal.createUniqueKey(Picture.PICTURE, DSL.name("picture_pkey"), arrayOf(Picture.PICTURE.ID), true)
+
+// -------------------------------------------------------------------------
+// FOREIGN KEY definitions
+// -------------------------------------------------------------------------
+
+val PICTURE__PICTURE_GUILD_ID_FKEY: ForeignKey<PictureRecord, GuildRecord> = Internal.createForeignKey(Picture.PICTURE, DSL.name("picture_guild_id_fkey"), arrayOf(Picture.PICTURE.GUILD_ID), com.github.ball.ballbot.domain.generated.keys.GUILD_PKEY, arrayOf(Guild.GUILD.ID), true)

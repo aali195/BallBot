@@ -5,13 +5,17 @@ package com.github.ball.ballbot.domain.generated.tables
 
 
 import com.github.ball.ballbot.domain.generated.BallbotSchema
+import com.github.ball.ballbot.domain.generated.indexes.GUILD_ID_IDX
 import com.github.ball.ballbot.domain.generated.keys.GUILD_PKEY
 import com.github.ball.ballbot.domain.generated.tables.records.GuildRecord
 
 import java.time.OffsetDateTime
 
+import kotlin.collections.List
+
 import org.jooq.Field
 import org.jooq.ForeignKey
+import org.jooq.Index
 import org.jooq.Name
 import org.jooq.Record
 import org.jooq.Row4
@@ -99,6 +103,7 @@ open class Guild(
 
     constructor(child: Table<out Record>, key: ForeignKey<out Record, GuildRecord>): this(Internal.createPathAlias(child, key), child, key, GUILD, null)
     override fun getSchema(): Schema? = if (aliased()) null else BallbotSchema.BALLBOT_SCHEMA
+    override fun getIndexes(): List<Index> = listOf(GUILD_ID_IDX)
     override fun getPrimaryKey(): UniqueKey<GuildRecord> = GUILD_PKEY
     override fun `as`(alias: String): Guild = Guild(DSL.name(alias), this)
     override fun `as`(alias: Name): Guild = Guild(alias, this)

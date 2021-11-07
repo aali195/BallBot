@@ -19,7 +19,7 @@ object EventHandler : ListenerAdapter() {
     }
 
     override fun onGuildJoin(event: GuildJoinEvent) {
-        guildRepo.createGuildEntry(event.guild.id, DEFAULT_COMMAND_PREFIX)
+        guildRepo.createGuild(event.guild.id, DEFAULT_COMMAND_PREFIX)
         updatePrefixMap()
     }
 
@@ -37,7 +37,7 @@ object EventHandler : ListenerAdapter() {
 }
 
 private fun GuildMessageReceivedEvent.isInvalid(guildPrefix: String): Boolean =
-    author.isBot && !message.contentRaw.startsWith(guildPrefix)
+    author.isBot || !message.contentRaw.startsWith(guildPrefix)
 
 private fun GuildMessageReceivedEvent.asCommandContext(guildPrefix: String) = CommandContext(
     channel = channel,
