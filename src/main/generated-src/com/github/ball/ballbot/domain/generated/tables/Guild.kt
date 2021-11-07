@@ -69,9 +69,9 @@ open class Guild(
     val ID: TableField<GuildRecord, String?> = createField(DSL.name("id"), SQLDataType.CLOB.nullable(false), this, "")
 
     /**
-     * The column <code>ballbot_schema.guild.created</code>.
+     * The column <code>ballbot_schema.guild.joined</code>.
      */
-    val CREATED: TableField<GuildRecord, OffsetDateTime?> = createField(DSL.name("created"), SQLDataType.TIMESTAMPWITHTIMEZONE(6).defaultValue(DSL.field("now()", SQLDataType.TIMESTAMPWITHTIMEZONE)), this, "")
+    val JOINED: TableField<GuildRecord, OffsetDateTime?> = createField(DSL.name("joined"), SQLDataType.TIMESTAMPWITHTIMEZONE(6).defaultValue(DSL.field("now()", SQLDataType.TIMESTAMPWITHTIMEZONE)), this, "")
 
     /**
      * The column <code>ballbot_schema.guild.last_updated</code>.

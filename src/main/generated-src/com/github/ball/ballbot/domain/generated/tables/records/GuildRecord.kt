@@ -25,7 +25,7 @@ open class GuildRecord() : UpdatableRecordImpl<GuildRecord>(Guild.GUILD), Record
         set(value): Unit = set(0, value)
         get(): String? = get(0) as String?
 
-    var created: OffsetDateTime?
+    var joined: OffsetDateTime?
         set(value): Unit = set(1, value)
         get(): OffsetDateTime? = get(1) as OffsetDateTime?
 
@@ -50,15 +50,15 @@ open class GuildRecord() : UpdatableRecordImpl<GuildRecord>(Guild.GUILD), Record
     override fun fieldsRow(): Row4<String?, OffsetDateTime?, OffsetDateTime?, String?> = super.fieldsRow() as Row4<String?, OffsetDateTime?, OffsetDateTime?, String?>
     override fun valuesRow(): Row4<String?, OffsetDateTime?, OffsetDateTime?, String?> = super.valuesRow() as Row4<String?, OffsetDateTime?, OffsetDateTime?, String?>
     override fun field1(): Field<String?> = Guild.GUILD.ID
-    override fun field2(): Field<OffsetDateTime?> = Guild.GUILD.CREATED
+    override fun field2(): Field<OffsetDateTime?> = Guild.GUILD.JOINED
     override fun field3(): Field<OffsetDateTime?> = Guild.GUILD.LAST_UPDATED
     override fun field4(): Field<String?> = Guild.GUILD.PREFIX
     override fun component1(): String? = id
-    override fun component2(): OffsetDateTime? = created
+    override fun component2(): OffsetDateTime? = joined
     override fun component3(): OffsetDateTime? = lastUpdated
     override fun component4(): String? = prefix
     override fun value1(): String? = id
-    override fun value2(): OffsetDateTime? = created
+    override fun value2(): OffsetDateTime? = joined
     override fun value3(): OffsetDateTime? = lastUpdated
     override fun value4(): String? = prefix
 
@@ -68,7 +68,7 @@ open class GuildRecord() : UpdatableRecordImpl<GuildRecord>(Guild.GUILD), Record
     }
 
     override fun value2(value: OffsetDateTime?): GuildRecord {
-        this.created = value
+        this.joined = value
         return this
     }
 
@@ -93,9 +93,9 @@ open class GuildRecord() : UpdatableRecordImpl<GuildRecord>(Guild.GUILD), Record
     /**
      * Create a detached, initialised GuildRecord
      */
-    constructor(id: String? = null, created: OffsetDateTime? = null, lastUpdated: OffsetDateTime? = null, prefix: String? = null): this() {
+    constructor(id: String? = null, joined: OffsetDateTime? = null, lastUpdated: OffsetDateTime? = null, prefix: String? = null): this() {
         this.id = id
-        this.created = created
+        this.joined = joined
         this.lastUpdated = lastUpdated
         this.prefix = prefix
     }

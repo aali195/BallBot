@@ -31,4 +31,7 @@ data class CommandContext(
     private val messageArgs = message.contentDisplay.removePrefix(prefix).split(" ")
     val commandString: String = messageArgs[0]
     val commandArgs: List<String> = messageArgs.drop(1)
+
+    fun reactWithComplete() = message.addReaction("✔").queue()
+    fun reactWithFail() = message.addReaction("❌").queue()
 }

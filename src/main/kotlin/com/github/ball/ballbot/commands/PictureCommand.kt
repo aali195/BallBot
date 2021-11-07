@@ -33,7 +33,7 @@ object PictureCommand : Command() {
                 uploaderId = author.id,
                 tags = tags
             )
-            if (result == 1) message.addReaction("✔").queue() else message.addReaction("❌").queue()
+            if (result == 1) reactWithComplete() else reactWithFail()
         } else message.reply("its: $usage").queue()
     }
 
@@ -45,7 +45,7 @@ object PictureCommand : Command() {
         val name = commandArgs.getOrNull(1)
         if (name != null) {
             val result = pictureRepo.deletePicture(name = name, uploaderId = author.id)
-            if (result == 1) message.addReaction("✔").queue() else message.addReaction("❌").queue()
+            if (result == 1) reactWithComplete() else reactWithFail()
         } else message.reply("its: $usage").queue()
     }
 
@@ -55,14 +55,14 @@ object PictureCommand : Command() {
             pictureRepo.getPictureUrlsByTag(tags = tags, guildId = guild.id)
                 .takeIf { it.isNotEmpty() }
                 ?.run { message.reply(this.random()!!).queue() }
-                ?: message.addReaction("❌")
+                ?: reactWithFail()
         } else message.reply("its: $usage").queue()
     }
 
     private fun getUrlSubCommand(context: CommandContext) = with(context) {
         pictureRepo.getPictureUrl(name = commandArgs[0], guildId = guild.id)
             ?.run { message.reply(this).queue() }
-            ?: message.addReaction("❌").queue()
+            ?: reactWithFail()
     }
 
     override val description: String = """

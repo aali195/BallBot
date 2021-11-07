@@ -10,7 +10,7 @@ private val logger = KotlinLogging.logger {}
 
 interface GuildRepository {
     fun getGuildIdToPrefixMap(): Map<String?, String?>
-    fun createGuild(guildId: String, defaultPrefix: String): Int
+    fun insertIfNotExists(guildId: String, defaultPrefix: String): Int
     fun updateGuildPrefix(guildId: String, updatedPrefix: String): Int
 }
 
@@ -29,7 +29,7 @@ object GuildRepositoryImpl : GuildRepository {
         .onSuccess { logger.info { "guild id to prefix map fetched" } }
         .getOrThrow()
 
-    override fun createGuild(guildId: String, defaultPrefix: String): Int = GUILD
+    override fun insertIfNotExists(guildId: String, defaultPrefix: String): Int = GUILD
         .runCatching {
             dslContext
                 .insertInto(this)
@@ -38,8 +38,7 @@ object GuildRepositoryImpl : GuildRepository {
                 .onDuplicateKeyIgnore()
                 .execute()
         }
-        .onFailure { logger.error { "failed to create new guild record for guild id: $guildId" } }
-        .onSuccess { logger.info { "new guild record created for guild id: $guildId" } }
+        .onFailure { logger.error { "failed to create or find guild record for guild id: $guildId" } }
         .getOrThrow()
 
     override fun updateGuildPrefix(guildId: String, updatedPrefix: String) = GUILD
@@ -52,7 +51,6 @@ object GuildRepositoryImpl : GuildRepository {
                 .execute()
         }
         .onFailure { logger.error { "failed to update guild prefix for guild id: $guildId using: $updatedPrefix" } }
-        .onSuccess { logger.info { "guild prefix updated for guild id: $guildId using: $updatedPrefix" } }
         .getOrThrow()
 
 }

@@ -14,7 +14,7 @@ object GuildPrefixCommand : Command() {
         val newPrefix = commandArgs.getOrNull(0)
         if (newPrefix != null) {
             guildRepo.updateGuildPrefix(guild.id, newPrefix)
-            message.reply("set server prefix: $newPrefix").queue()
+            reactWithComplete()
             EventHandler.updatePrefixMap()
         } else message.reply("its: $usage").queue()
     }
