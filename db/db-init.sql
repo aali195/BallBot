@@ -14,7 +14,7 @@ $do$;
 
 CREATE DATABASE ballbot_db OWNER ballbot;
 
-\c ballbot;
+\c ballbot_db;
 CREATE SCHEMA IF NOT EXISTS ballbot_schema AUTHORIZATION ballbot;
 
 REVOKE ALL ON SCHEMA public FROM PUBLIC;
