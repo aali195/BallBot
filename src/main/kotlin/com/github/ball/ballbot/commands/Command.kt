@@ -12,9 +12,9 @@ abstract class Command {
 
     abstract fun execute(context: CommandContext)
 
-    open val description: String? = null
+    abstract val description: String
 
-    open val usage: String? = null
+    abstract val usage: String
 
     // Permission?
 
