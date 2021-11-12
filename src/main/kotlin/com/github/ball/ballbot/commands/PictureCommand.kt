@@ -22,9 +22,12 @@ object PictureCommand : Command() {
 
     private fun addSubCommand(context: CommandContext) = with(context) {
         val name = commandArgs.getOrNull(1)
-        val url = commandArgs.getOrNull(2)
-            ?.takeIf { it.matches(URL_REGEX) }
-        val tags = commandArgs.drop(3)
+        val attachment = message.attachments.firstOrNull()
+        val url = attachment?.url
+            ?: commandArgs.getOrNull(2)?.takeIf { it.matches(URL_REGEX) }
+        val tags = attachment?.let { commandArgs.drop(2) } // URl would not be passed for attachments
+            ?: commandArgs.drop(3)
+
         if (name != null && url != null) {
             val result = pictureRepo.insertPicture(
                 name = name,
