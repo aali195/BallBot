@@ -8,7 +8,7 @@ import org.jooq.DSLContext
 private val logger = KotlinLogging.logger {}
 
 interface PictureRepository {
-    fun insertPicture(name: String, guildId: String, uploaderId: String, url: String, tags: List<String>): Int?
+    fun insertPicture(name: String, guildId: String, uploaderId: String, url: String, tags: Set<String>): Int?
     fun getPictureInfo(name: String, guildId: String): PictureRecord?
     fun getPictureUrl(name: String, guildId: String): String?
     fun deletePicture(name: String, uploaderId: String): Int?
@@ -24,7 +24,7 @@ object PictureRepositoryImpl : PictureRepository {
         guildId: String,
         uploaderId: String,
         url: String,
-        tags: List<String>
+        tags: Set<String>
     ): Int? = PICTURE
         .runCatching {
             dslContext

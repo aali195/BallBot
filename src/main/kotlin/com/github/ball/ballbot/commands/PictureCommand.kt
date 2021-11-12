@@ -34,7 +34,7 @@ object PictureCommand : Command() {
                 url = url,
                 guildId = guild.id,
                 uploaderId = author.id,
-                tags = tags
+                tags = tags.toSet()
             )
             if (result == 1) reactWithComplete() else reactWithFail()
         } else message.reply("its: $usage").queue()
@@ -74,8 +74,10 @@ object PictureCommand : Command() {
 
     override val usage: String = """
         
-        add:
+        add via url:
             `[current_prefix]p add [name] [url] (optional tags with spaces between)`
+        add via attachment:
+            `[current_prefix]p add [name] (optional tags with spaces between)`
         get info:
             `wip`
         get url:
