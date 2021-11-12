@@ -1,5 +1,6 @@
 package com.github.ball.ballbot.commands
 
+import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.Message
@@ -26,7 +27,8 @@ data class CommandContext(
     val guild: Guild,
     val member: Member?,
     val author: User,
-    val prefix: String
+    val prefix: String,
+    val jda: JDA
 ) {
     private val messageArgs = message.contentDisplay.removePrefix(prefix).split(" ")
     val commandString: String = messageArgs[0]

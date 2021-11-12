@@ -50,7 +50,8 @@ private fun GuildMessageReceivedEvent.asCommandContext(guildPrefix: String) = Co
     guild = guild,
     member = member,
     author = author,
-    prefix = guildPrefix
+    prefix = guildPrefix,
+    jda = jda
 )
 
 private const val DEFAULT_COMMAND_PREFIX = "!"

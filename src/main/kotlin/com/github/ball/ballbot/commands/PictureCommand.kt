@@ -1,7 +1,10 @@
 package com.github.ball.ballbot.commands
 
+import com.github.ball.ballbot.domain.generated.tables.records.PictureRecord
 import com.github.ball.ballbot.repository.PictureRepository
 import com.github.ball.ballbot.repository.PictureRepositoryImpl
+import dev.minn.jda.ktx.Embed
+import java.time.format.DateTimeFormatter
 
 object PictureCommand : Command() {
 
@@ -41,7 +44,11 @@ object PictureCommand : Command() {
     }
 
     private fun infoSubCommand(context: CommandContext) = with(context) {
-        message.reply("wip").queue()
+        val pictureName = commandArgs.getOrNull(1)
+        if (pictureName != null) {
+            pictureRepo.getPictureInfo(name = pictureName, guildId = guild.id)
+                ?.run { message.reply(asMessageEmbed(context)).queue() }
+        } else message.reply("its: $usage").queue()
     }
 
     private fun deleteSubCommand(context: CommandContext) = with(context) {
@@ -79,7 +86,7 @@ object PictureCommand : Command() {
         add via attachment:
             `[current_prefix]p add [name] (optional tags with spaces between)`
         get info:
-            `wip`
+            `[current_prefix]p info [name]`
         get url:
             `[current_prefix]p [name]`
         delete (uploader only):
@@ -91,3 +98,37 @@ object PictureCommand : Command() {
 }
 
 private val URL_REGEX = "(https?:\\/\\/).*\\.[a-zA-Z0-9]{2,6}\\/*.+".toRegex()
+
+private fun PictureRecord.asMessageEmbed(context: CommandContext) = Embed {
+    color = 0xFFFFFF
+    image = this@asMessageEmbed.url!!
+    field {
+        name = "Name"
+        value = this@asMessageEmbed.name!!
+        inline = false
+    }
+    field {
+        name = "URL"
+        value = this@asMessageEmbed.url!!
+        inline = false
+    }
+    field {
+        name = "Created"
+        value = this@asMessageEmbed.created!!
+            .format(DateTimeFormatter.RFC_1123_DATE_TIME)
+        inline = false
+    }
+    field {
+        name = "Uploader"
+        value = context.jda.retrieveUserById(this@asMessageEmbed.uploaderId!!)
+            .complete().name
+        inline = false
+    }
+    if (!tags.isNullOrEmpty()) {
+        field {
+            name = "Tags"
+            value = this@asMessageEmbed.tags.contentToString()
+            inline = false
+        }
+    }
+}
