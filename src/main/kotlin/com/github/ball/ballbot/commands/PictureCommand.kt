@@ -40,7 +40,7 @@ object PictureCommand : Command() {
                 url = url,
                 guildId = guild.id,
                 uploaderId = author.id,
-                tags = tags.toSet()
+                tags = tags.plus(name).toSet()
             )
             if (result == 1) reactWithComplete() else reactWithFail()
         } else message.reply("its: $usage").queue()
