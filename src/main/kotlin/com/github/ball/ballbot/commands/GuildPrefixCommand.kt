@@ -11,12 +11,14 @@ object GuildPrefixCommand : Command() {
     override val command: String = "prefix"
 
     override fun execute(context: CommandContext) = with(context) {
-        val newPrefix = commandArgs.getOrNull(0)
-        if (newPrefix != null) {
-            guildRepo.updateGuildPrefix(guild.id, newPrefix)
-            reactWithComplete()
-            EventHandler.updatePrefixMap()
-        } else message.reply("its: $usage").queue()
+        commandArgs.getOrNull(0)
+            .takeUnless { it.isNullOrEmpty() }
+            ?.run {
+                guildRepo.updateGuildPrefix(guild.id, this)
+                reactWithComplete()
+                EventHandler.updatePrefixMap()
+            }
+            ?: run { message.reply("its: $usage").queue() }
     }
 
     override val description: String = """

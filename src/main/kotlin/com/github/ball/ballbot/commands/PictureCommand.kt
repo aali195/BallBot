@@ -57,7 +57,7 @@ object PictureCommand : Command() {
     private fun deleteSubCommand(context: CommandContext) = with(context) {
         val name = commandArgs.getOrNull(1)
         if (name != null) {
-            val result = if(member?.isOwner == true) {
+            val result = if (member?.isOwner == true) {
                 logger.warn { "admin deleting picture with name: $name from guildId: ${guild.id}" }
                 pictureRepo.adminDelete(name = name)
             } else {
@@ -92,17 +92,17 @@ object PictureCommand : Command() {
     override val usage: String = """
         
         add via url:
-            `[current_prefix]p add [name] [url] (optional tags with spaces between)`
+            `[prefix]p add [name] [url] (optional tags with spaces between)`
         add via attachment:
-            `[current_prefix]p add [name] (optional tags with spaces between)`
+            `[prefix]p add [name] (optional tags with spaces between)`
         get info:
-            `[current_prefix]p info [name]`
+            `[prefix]p info [name]`
         get url:
-            `[current_prefix]p [name]`
+            `[prefix]p [name]`
         delete (uploader only):
-            `[current_prefix]p delete [name]`
+            `[prefix]p delete [name]`
         get randomly tagged:
-            `[current_prefix]p tag [tag]`
+            `[prefix]p tag [tag]`
     """.trimIndent()
 
 }
