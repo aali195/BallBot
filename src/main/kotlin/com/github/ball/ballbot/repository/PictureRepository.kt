@@ -8,18 +8,19 @@ import org.jooq.DSLContext
 private val logger = KotlinLogging.logger {}
 
 interface PictureRepository {
-    fun insertPicture(name: String, guildId: String, uploaderId: String, url: String, tags: Set<String>): Int?
-    fun getPictureInfo(name: String, guildId: String): PictureRecord?
-    fun getPictureUrl(name: String, guildId: String): String?
-    fun deletePicture(name: String, uploaderId: String): Int?
-    fun getPictureUrlsByTag(tags: List<String>, guildId: String): List<String?>
+    fun insert(name: String, guildId: String, uploaderId: String, url: String, tags: Set<String>): Int?
+    fun getInfo(name: String, guildId: String): PictureRecord?
+    fun getUrl(name: String, guildId: String): String?
+    fun delete(name: String, uploaderId: String): Int?
+    fun adminDelete(name: String): Int?
+    fun getUrlsByTag(tags: List<String>, guildId: String): List<String?>
 }
 
 object PictureRepositoryImpl : PictureRepository {
 
     private val dslContext: DSLContext = DslConfig.dslContext
 
-    override fun insertPicture(
+    override fun insert(
         name: String,
         guildId: String,
         uploaderId: String,
@@ -39,7 +40,7 @@ object PictureRepositoryImpl : PictureRepository {
         .onFailure { logger.error { "failed to create picture record for name: $name guild id: $guildId" } }
         .getOrNull()
 
-    override fun getPictureInfo(name: String, guildId: String): PictureRecord? = PICTURE
+    override fun getInfo(name: String, guildId: String): PictureRecord? = PICTURE
         .runCatching {
             dslContext
                 .selectFrom(this)
@@ -49,7 +50,7 @@ object PictureRepositoryImpl : PictureRepository {
         .onFailure { logger.error { "failed to find picture record with name: $name for guild id: $guildId" } }
         .getOrThrow()
 
-    override fun getPictureUrl(name: String, guildId: String): String? = PICTURE
+    override fun getUrl(name: String, guildId: String): String? = PICTURE
         .runCatching {
             dslContext
                 .selectFrom(this)
@@ -59,7 +60,7 @@ object PictureRepositoryImpl : PictureRepository {
         .onFailure { logger.error { "failed to find picture url with name: $name for guild id: $guildId" } }
         .getOrThrow()
 
-    override fun deletePicture(name: String, uploaderId: String): Int? = PICTURE
+    override fun delete(name: String, uploaderId: String): Int? = PICTURE
         .runCatching {
             dslContext
                 .deleteFrom(this)
@@ -69,7 +70,17 @@ object PictureRepositoryImpl : PictureRepository {
         .onFailure { logger.error { "failed to delete picture record with name: $name and uploader id: $uploaderId" } }
         .getOrNull()
 
-    override fun getPictureUrlsByTag(tags: List<String>, guildId: String): List<String?> = PICTURE
+    override fun adminDelete(name: String): Int? = PICTURE
+        .runCatching {
+            dslContext
+                .deleteFrom(this)
+                .where(NAME.equalIgnoreCase(name))
+                .execute()
+        }
+        .onFailure { logger.error { "failed to admin delete picture record with name: $name" } }
+        .getOrNull()
+
+    override fun getUrlsByTag(tags: List<String>, guildId: String): List<String?> = PICTURE
         .runCatching {
             dslContext
                 .selectFrom(this)
@@ -79,4 +90,5 @@ object PictureRepositoryImpl : PictureRepository {
         }
         .onFailure { logger.error { "failed to get picture urls by tag with tags: $tags and guild id: $guildId" } }
         .getOrThrow()
+
 }

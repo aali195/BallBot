@@ -4,7 +4,10 @@ import com.github.ball.ballbot.domain.generated.tables.records.PictureRecord
 import com.github.ball.ballbot.repository.PictureRepository
 import com.github.ball.ballbot.repository.PictureRepositoryImpl
 import dev.minn.jda.ktx.Embed
+import mu.KotlinLogging
 import java.time.format.DateTimeFormatter
+
+private val logger = KotlinLogging.logger {}
 
 object PictureCommand : Command() {
 
@@ -32,7 +35,7 @@ object PictureCommand : Command() {
             ?: commandArgs.drop(3)
 
         if (name != null && url != null) {
-            val result = pictureRepo.insertPicture(
+            val result = pictureRepo.insert(
                 name = name,
                 url = url,
                 guildId = guild.id,
@@ -46,7 +49,7 @@ object PictureCommand : Command() {
     private fun infoSubCommand(context: CommandContext) = with(context) {
         val pictureName = commandArgs.getOrNull(1)
         if (pictureName != null) {
-            pictureRepo.getPictureInfo(name = pictureName, guildId = guild.id)
+            pictureRepo.getInfo(name = pictureName, guildId = guild.id)
                 ?.run { message.reply(asMessageEmbed(context)).queue() }
         } else message.reply("its: $usage").queue()
     }
@@ -54,7 +57,14 @@ object PictureCommand : Command() {
     private fun deleteSubCommand(context: CommandContext) = with(context) {
         val name = commandArgs.getOrNull(1)
         if (name != null) {
-            val result = pictureRepo.deletePicture(name = name, uploaderId = author.id)
+            val result = if(member?.isOwner == true) {
+                logger.warn { "admin deleting picture with name: $name from guildId: ${guild.id}" }
+                pictureRepo.adminDelete(name = name)
+            } else {
+                logger.warn { "deleting picture with name: $name from guildId: ${guild.id}" }
+                pictureRepo.delete(name = name, uploaderId = author.id)
+            }
+
             if (result == 1) reactWithComplete() else reactWithFail()
         } else message.reply("its: $usage").queue()
     }
@@ -62,7 +72,7 @@ object PictureCommand : Command() {
     private fun tagSubCommand(context: CommandContext) = with(context) {
         val tags = commandArgs.drop(1)
         if (tags.isNotEmpty()) {
-            pictureRepo.getPictureUrlsByTag(tags = tags, guildId = guild.id)
+            pictureRepo.getUrlsByTag(tags = tags, guildId = guild.id)
                 .takeIf { it.isNotEmpty() }
                 ?.run { message.reply(this.random()!!).queue() }
                 ?: reactWithFail()
@@ -70,7 +80,7 @@ object PictureCommand : Command() {
     }
 
     private fun getUrlSubCommand(context: CommandContext) = with(context) {
-        pictureRepo.getPictureUrl(name = commandArgs[0], guildId = guild.id)
+        pictureRepo.getUrl(name = commandArgs[0], guildId = guild.id)
             ?.run { message.reply(this).queue() }
             ?: reactWithFail()
     }
