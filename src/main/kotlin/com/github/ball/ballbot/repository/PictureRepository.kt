@@ -11,12 +11,12 @@ interface PictureRepository {
     fun insert(name: String, guildId: String, uploaderId: String, url: String, tags: Set<String>): Int?
     fun getInfo(name: String, guildId: String): PictureRecord?
     fun getUrl(name: String, guildId: String): String?
-    fun delete(name: String, uploaderId: String): Int?
-    fun adminDelete(name: String): Int?
+    fun delete(name: String, uploaderId: String): Int? // and guild
+    fun adminDelete(name: String): Int? // and guild
     fun getUrlsByTag(tags: List<String>, guildId: String): List<String?>
 }
 
-object PictureRepositoryImpl : PictureRepository {
+object PictureRepositoryImpl : PictureRepository { // go over ignore cases
 
     private val dslContext: DSLContext = DslConfig.dslContext
 
@@ -37,7 +37,7 @@ object PictureRepositoryImpl : PictureRepository {
                 .set(TAGS, tags.toTypedArray())
                 .execute()
         }
-        .onFailure { logger.error { "failed to create picture record for name: $name guild id: $guildId" } }
+        .onFailure { logger.error(it) { "failed to create picture record for name: $name guild id: $guildId" } }
         .getOrNull()
 
     override fun getInfo(name: String, guildId: String): PictureRecord? = PICTURE
@@ -47,7 +47,7 @@ object PictureRepositoryImpl : PictureRepository {
                 .where(NAME.equalIgnoreCase(name), GUILD_ID.eq(guildId))
                 .fetchOne()
         }
-        .onFailure { logger.error { "failed to find picture record with name: $name for guild id: $guildId" } }
+        .onFailure { logger.error(it) { "failed to find picture record with name: $name for guild id: $guildId" } }
         .getOrThrow()
 
     override fun getUrl(name: String, guildId: String): String? = PICTURE
@@ -57,7 +57,7 @@ object PictureRepositoryImpl : PictureRepository {
                 .where(NAME.equalIgnoreCase(name), GUILD_ID.eq(guildId))
                 .fetchOne(URL)
         }
-        .onFailure { logger.error { "failed to find picture url with name: $name for guild id: $guildId" } }
+        .onFailure { logger.error(it) { "failed to find picture url with name: $name for guild id: $guildId" } }
         .getOrThrow()
 
     override fun delete(name: String, uploaderId: String): Int? = PICTURE
@@ -67,17 +67,17 @@ object PictureRepositoryImpl : PictureRepository {
                 .where(NAME.equalIgnoreCase(name), UPLOADER_ID.eq(uploaderId))
                 .execute()
         }
-        .onFailure { logger.error { "failed to delete picture record with name: $name and uploader id: $uploaderId" } }
+        .onFailure { logger.error(it) { "failed to delete picture record with name: $name and uploader id: $uploaderId" } }
         .getOrNull()
 
     override fun adminDelete(name: String): Int? = PICTURE
         .runCatching {
             dslContext
-                .deleteFrom(this)
+                .deleteFrom(this) // guildId
                 .where(NAME.equalIgnoreCase(name))
                 .execute()
         }
-        .onFailure { logger.error { "failed to admin delete picture record with name: $name" } }
+        .onFailure { logger.error(it) { "failed to admin delete picture record with name: $name" } }
         .getOrNull()
 
     override fun getUrlsByTag(tags: List<String>, guildId: String): List<String?> = PICTURE
@@ -88,7 +88,7 @@ object PictureRepositoryImpl : PictureRepository {
                 .fetch(URL)
                 .toList()
         }
-        .onFailure { logger.error { "failed to get picture urls by tag with tags: $tags and guild id: $guildId" } }
+        .onFailure { logger.error(it) { "failed to get picture urls by tag with tags: $tags and guild id: $guildId" } }
         .getOrThrow()
 
 }

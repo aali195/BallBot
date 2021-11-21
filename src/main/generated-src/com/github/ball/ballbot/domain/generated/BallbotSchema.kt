@@ -6,6 +6,7 @@ package com.github.ball.ballbot.domain.generated
 
 import com.github.ball.ballbot.domain.generated.tables.Guild
 import com.github.ball.ballbot.domain.generated.tables.Picture
+import com.github.ball.ballbot.domain.generated.tables.TwitterScheduleTask
 
 import kotlin.collections.List
 
@@ -37,10 +38,16 @@ open class BallbotSchema : SchemaImpl("ballbot_schema", DefaultCatalog.DEFAULT_C
      */
     val PICTURE: Picture get() = Picture.PICTURE
 
+    /**
+     * The table <code>ballbot_schema.twitter_schedule_task</code>.
+     */
+    val TWITTER_SCHEDULE_TASK: TwitterScheduleTask get() = TwitterScheduleTask.TWITTER_SCHEDULE_TASK
+
     override fun getCatalog(): Catalog = DefaultCatalog.DEFAULT_CATALOG
 
     override fun getTables(): List<Table<*>> = listOf(
         Guild.GUILD,
-        Picture.PICTURE
+        Picture.PICTURE,
+        TwitterScheduleTask.TWITTER_SCHEDULE_TASK
     )
 }

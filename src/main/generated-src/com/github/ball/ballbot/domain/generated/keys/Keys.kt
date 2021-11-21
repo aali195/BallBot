@@ -6,8 +6,10 @@ package com.github.ball.ballbot.domain.generated.keys
 
 import com.github.ball.ballbot.domain.generated.tables.Guild
 import com.github.ball.ballbot.domain.generated.tables.Picture
+import com.github.ball.ballbot.domain.generated.tables.TwitterScheduleTask
 import com.github.ball.ballbot.domain.generated.tables.records.GuildRecord
 import com.github.ball.ballbot.domain.generated.tables.records.PictureRecord
+import com.github.ball.ballbot.domain.generated.tables.records.TwitterScheduleTaskRecord
 
 import org.jooq.ForeignKey
 import org.jooq.UniqueKey
@@ -22,9 +24,11 @@ import org.jooq.impl.Internal
 
 val GUILD_PKEY: UniqueKey<GuildRecord> = Internal.createUniqueKey(Guild.GUILD, DSL.name("guild_pkey"), arrayOf(Guild.GUILD.ID), true)
 val PICTURE_PKEY: UniqueKey<PictureRecord> = Internal.createUniqueKey(Picture.PICTURE, DSL.name("picture_pkey"), arrayOf(Picture.PICTURE.ID), true)
+val TWITTER_SCHEDULE_TASK_PKEY: UniqueKey<TwitterScheduleTaskRecord> = Internal.createUniqueKey(TwitterScheduleTask.TWITTER_SCHEDULE_TASK, DSL.name("twitter_schedule_task_pkey"), arrayOf(TwitterScheduleTask.TWITTER_SCHEDULE_TASK.ID), true)
 
 // -------------------------------------------------------------------------
 // FOREIGN KEY definitions
 // -------------------------------------------------------------------------
 
 val PICTURE__PICTURE_GUILD_ID_FKEY: ForeignKey<PictureRecord, GuildRecord> = Internal.createForeignKey(Picture.PICTURE, DSL.name("picture_guild_id_fkey"), arrayOf(Picture.PICTURE.GUILD_ID), com.github.ball.ballbot.domain.generated.keys.GUILD_PKEY, arrayOf(Guild.GUILD.ID), true)
+val TWITTER_SCHEDULE_TASK__TWITTER_SCHEDULE_TASK_GUILD_ID_FKEY: ForeignKey<TwitterScheduleTaskRecord, GuildRecord> = Internal.createForeignKey(TwitterScheduleTask.TWITTER_SCHEDULE_TASK, DSL.name("twitter_schedule_task_guild_id_fkey"), arrayOf(TwitterScheduleTask.TWITTER_SCHEDULE_TASK.GUILD_ID), com.github.ball.ballbot.domain.generated.keys.GUILD_PKEY, arrayOf(Guild.GUILD.ID), true)

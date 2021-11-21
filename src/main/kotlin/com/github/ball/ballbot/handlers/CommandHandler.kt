@@ -6,6 +6,7 @@ import com.github.ball.ballbot.commands.CommandContext
 import com.github.ball.ballbot.commands.GuildPrefixCommand
 import com.github.ball.ballbot.commands.MarkovCommand
 import com.github.ball.ballbot.commands.PictureCommand
+import com.github.ball.ballbot.commands.TwitterCommand
 import dev.minn.jda.ktx.Embed
 
 object CommandHandler {
@@ -14,7 +15,8 @@ object CommandHandler {
         MarkovCommand,
         GuildPrefixCommand,
         PictureCommand,
-        ChooseCommand
+        ChooseCommand,
+        TwitterCommand
     )
 
     internal operator fun invoke(context: CommandContext) = with(context) {

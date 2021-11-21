@@ -25,7 +25,7 @@ object GuildRepositoryImpl : GuildRepository {
                 .fetchMap(ID, PREFIX)
                 .toMap()
         }
-        .onFailure { logger.error { "failed to get guild id to prefix map" } }
+        .onFailure { logger.error(it) { "failed to get guild id to prefix map" } }
         .onSuccess { logger.info { "guild id to prefix map fetched" } }
         .getOrThrow()
 
@@ -38,7 +38,7 @@ object GuildRepositoryImpl : GuildRepository {
                 .onDuplicateKeyIgnore()
                 .execute()
         }
-        .onFailure { logger.error { "failed to create or find guild record for guild id: $guildId" } }
+        .onFailure { logger.error(it) { "failed to create or find guild record for guild id: $guildId" } }
         .getOrThrow()
 
     override fun updateGuildPrefix(guildId: String, updatedPrefix: String) = GUILD
@@ -50,7 +50,7 @@ object GuildRepositoryImpl : GuildRepository {
                 .where(ID.eq(guildId))
                 .execute()
         }
-        .onFailure { logger.error { "failed to update guild prefix for guild id: $guildId using: $updatedPrefix" } }
+        .onFailure { logger.error(it) { "failed to update guild prefix for guild id: $guildId using: $updatedPrefix" } }
         .getOrThrow()
 
 }

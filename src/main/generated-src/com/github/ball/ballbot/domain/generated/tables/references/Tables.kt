@@ -6,6 +6,7 @@ package com.github.ball.ballbot.domain.generated.tables.references
 
 import com.github.ball.ballbot.domain.generated.tables.Guild
 import com.github.ball.ballbot.domain.generated.tables.Picture
+import com.github.ball.ballbot.domain.generated.tables.TwitterScheduleTask
 
 
 
@@ -18,3 +19,8 @@ val GUILD: Guild = Guild.GUILD
  * The table <code>ballbot_schema.picture</code>.
  */
 val PICTURE: Picture = Picture.PICTURE
+
+/**
+ * The table <code>ballbot_schema.twitter_schedule_task</code>.
+ */
+val TWITTER_SCHEDULE_TASK: TwitterScheduleTask = TwitterScheduleTask.TWITTER_SCHEDULE_TASK

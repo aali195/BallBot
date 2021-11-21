@@ -50,7 +50,7 @@ object PictureCommand : Command() {
         val pictureName = commandArgs.getOrNull(1)
         if (pictureName != null) {
             pictureRepo.getInfo(name = pictureName, guildId = guild.id)
-                ?.run { message.reply(asMessageEmbed(context)).queue() }
+                ?.run { message.reply(asInfoMessageEmbed(context)).queue() } //doesnt exist too
         } else message.reply("its: $usage").queue()
     }
 
@@ -99,7 +99,7 @@ object PictureCommand : Command() {
             `[prefix]p info [name]`
         get url:
             `[prefix]p [name]`
-        delete (uploader only):
+        delete (uploader and admins only):
             `[prefix]p delete [name]`
         get randomly tagged:
             `[prefix]p tag [tag]`
@@ -109,35 +109,35 @@ object PictureCommand : Command() {
 
 private val URL_REGEX = "(https?:\\/\\/).*\\.[a-zA-Z0-9]{2,6}\\/*.+".toRegex()
 
-private fun PictureRecord.asMessageEmbed(context: CommandContext) = Embed {
+private fun PictureRecord.asInfoMessageEmbed(context: CommandContext) = Embed {
     color = 0xFFFFFF
-    image = this@asMessageEmbed.url!!
+    image = this@asInfoMessageEmbed.url!!
     field {
         name = "Name"
-        value = this@asMessageEmbed.name!!
+        value = this@asInfoMessageEmbed.name!!
         inline = false
     }
     field {
         name = "URL"
-        value = this@asMessageEmbed.url!!
+        value = this@asInfoMessageEmbed.url!!
         inline = false
     }
     field {
         name = "Created"
-        value = this@asMessageEmbed.created!!
+        value = this@asInfoMessageEmbed.created!!
             .format(DateTimeFormatter.RFC_1123_DATE_TIME)
         inline = false
     }
     field {
         name = "Uploader"
-        value = context.jda.retrieveUserById(this@asMessageEmbed.uploaderId!!)
+        value = context.jda.retrieveUserById(this@asInfoMessageEmbed.uploaderId!!)
             .complete().name
         inline = false
     }
     if (!tags.isNullOrEmpty()) {
         field {
             name = "Tags"
-            value = this@asMessageEmbed.tags.contentToString()
+            value = this@asInfoMessageEmbed.tags.contentToString()
             inline = false
         }
     }
