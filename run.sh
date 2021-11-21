@@ -3,7 +3,7 @@ set -e
 
 # Best to run this via tmux to keep the session running - will probably dockerise the whole thing later so this was a waste of time
 
-APPLICATION_VERSION=${1:-"0.0.2"}
+APPLICATION_VERSION=${1:-"0.1.0"}
 APPLICATION_PATH="build/libs/BallBot-$APPLICATION_VERSION-all.jar"
 
 # Validation
