@@ -1,7 +1,6 @@
 package com.github.ball.ballbot.scheduler
 
 import blue.starry.penicillin.core.exceptions.PenicillinTwitterApiException
-import blue.starry.penicillin.core.response.JsonArrayResponse
 import blue.starry.penicillin.models.Status
 import com.github.ball.ballbot.client.TwitterClient
 import com.github.ball.ballbot.domain.generated.tables.records.TwitterScheduleTaskRecord
@@ -60,23 +59,19 @@ object TaskScheduler {
                     val tweets = twitterClient.getTweetsByUrlName(urlName, lastPostId)
                     postOrDeleteIfNoChannel(tweets, jda, guildId, channelId)
                     tweets.firstOrNull()?.id?.run { lastPostId = this }
-                } catch (e: PenicillinTwitterApiException) {
+                } catch (e: PenicillinTwitterApiException) {  // handle deleted/changed names
                     logger.warn { "problem with the Twitter API request: $e" }
                 }
                 delay(updateInterval)
             }
         }
 
-    private fun postOrDeleteIfNoChannel(
-        tweets: JsonArrayResponse<Status>,
-        jda: JDA,
-        guildId: String,
-        channelId: String
-    ) {
+    private fun postOrDeleteIfNoChannel(tweets: Set<Status>, jda: JDA, guildId: String, channelId: String) {
+        val tweetsSortedByOldest = tweets.reversed()
         jda.guildCache
             .getElementById(guildId)
             ?.getTextChannelById(channelId)
-            ?.run { tweets.forEach { sendMessage(it.asTwitterLinkWithStatus).queue() } }
+            ?.run { tweetsSortedByOldest.forEach { sendMessage(it.asTwitterLinkWithStatus).queue() } }
             ?: run {
                 logger.warn { "missing channel, deleting" }
                 twitterRepo.delete(tweets.first().user.screenName, guildId, channelId)

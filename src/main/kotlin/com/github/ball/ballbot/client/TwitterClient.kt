@@ -1,7 +1,6 @@
 package com.github.ball.ballbot.client
 
 import blue.starry.penicillin.PenicillinClient
-import blue.starry.penicillin.core.response.JsonArrayResponse
 import blue.starry.penicillin.core.session.config.account
 import blue.starry.penicillin.core.session.config.application
 import blue.starry.penicillin.core.session.config.token
@@ -31,7 +30,7 @@ object TwitterClient {
         }
     }
 
-    internal suspend fun getTweetsByUrlName(urlName: String, lastPostId: Long?): JsonArrayResponse<Status> =
+    internal suspend fun getTweetsByUrlName(urlName: String, lastPostId: Long?): Set<Status> =
         lastPostId
             ?.let {
                 client.timeline.userTimelineByScreenName(
@@ -39,7 +38,7 @@ object TwitterClient {
                     sinceId = it,
                     includeRTs = false,
                     excludeReplies = true
-                ).execute()
+                ).execute().toSet()
             }
             ?: let {
                 client.timeline.userTimelineByScreenName(
@@ -47,7 +46,7 @@ object TwitterClient {
                     count = 1,
                     includeRTs = false,
                     excludeReplies = true
-                ).execute()
+                ).execute().toSet()
             }
 
 }
