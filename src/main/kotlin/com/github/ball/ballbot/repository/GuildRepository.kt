@@ -38,7 +38,7 @@ object GuildRepositoryImpl : GuildRepository {
                 .onDuplicateKeyIgnore()
                 .execute()
         }
-        .onFailure { logger.error(it) { "failed to create or find guild record for guild id: $guildId" } }
+        .onFailure { logger.error(it) { "failed to create or find guild record for guild id: $guildId using default prefix: $defaultPrefix" } }
         .getOrThrow()
 
     override fun updateGuildPrefix(guildId: String, updatedPrefix: String) = GUILD
@@ -50,7 +50,7 @@ object GuildRepositoryImpl : GuildRepository {
                 .where(ID.eq(guildId))
                 .execute()
         }
-        .onFailure { logger.error(it) { "failed to update guild prefix for guild id: $guildId using: $updatedPrefix" } }
+        .onFailure { logger.error(it) { "failed to update guild prefix for guild id: $guildId using updated prefix: $updatedPrefix" } }
         .getOrThrow()
 
 }

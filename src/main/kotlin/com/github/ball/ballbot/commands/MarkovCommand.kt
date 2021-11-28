@@ -14,7 +14,7 @@ object MarkovCommand : Command() {
     """.trimIndent()
 
     override val usage: String = """
-        `[prefix]markov`
+        `[prefix]$command`
     """.trimIndent()
 
 }

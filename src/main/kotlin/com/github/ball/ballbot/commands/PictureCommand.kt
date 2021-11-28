@@ -37,7 +37,7 @@ object PictureCommand : Command() {
         if (name != null && url != null) {
             val result = pictureRepo.insert(
                 name = name,
-                url = url,
+                urlName = url,
                 guildId = guild.id,
                 uploaderId = author.id,
                 tags = tags.plus(name).toSet()
@@ -59,10 +59,10 @@ object PictureCommand : Command() {
         if (name != null) {
             val result = if (member?.isOwner == true) {
                 logger.warn { "admin deleting picture with name: $name from guildId: ${guild.id}" }
-                pictureRepo.adminDelete(name = name)
+                pictureRepo.adminDelete(name = name, guildId = guild.id)
             } else {
                 logger.warn { "deleting picture with name: $name from guildId: ${guild.id}" }
-                pictureRepo.delete(name = name, uploaderId = author.id)
+                pictureRepo.delete(name = name, uploaderId = author.id, guildId = guild.id)
             }
 
             if (result == 1) reactWithComplete() else reactWithFail()
@@ -92,17 +92,17 @@ object PictureCommand : Command() {
     override val usage: String = """
         
         add via url:
-            `[prefix]p add [name] [url] (optional tags with spaces between)`
+            `[prefix]$command add [name] [url] (optional tags with spaces between)`
         add via attachment:
-            `[prefix]p add [name] (optional tags with spaces between)`
+            `[prefix]$command add [name] (optional tags with spaces between)`
         get info:
-            `[prefix]p info [name]`
+            `[prefix]$command info [name]`
         get url:
-            `[prefix]p [name]`
+            `[prefix]$command [name]`
         delete (uploader and admins only):
-            `[prefix]p delete [name]`
+            `[prefix]$command delete [name]`
         get randomly tagged:
-            `[prefix]p tag [tag]`
+            `[prefix]$command tag [tag]`
     """.trimIndent()
 
 }

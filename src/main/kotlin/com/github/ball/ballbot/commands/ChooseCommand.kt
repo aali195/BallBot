@@ -19,7 +19,7 @@ object ChooseCommand : Command() {
     """.trimIndent()
 
     override val usage: String = """
-        `[prefix]choose [items with ',' between (spaces allowed)]`
+        `[prefix]$command [items with ',' between (spaces allowed)]`
     """.trimIndent()
 
 }

@@ -26,7 +26,7 @@ object GuildPrefixCommand : Command() {
     """.trimIndent()
 
     override val usage: String = """
-        `[current_prefix]prefix [new_prefix]`
+        `[current_prefix]$command [new_prefix]`
     """.trimIndent()
 
 }

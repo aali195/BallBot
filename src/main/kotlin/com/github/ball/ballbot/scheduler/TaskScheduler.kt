@@ -27,7 +27,7 @@ object TaskScheduler {
 
     private var twitterTaskById: MutableMap<Long, TwitterScheduleTaskRecord> = mutableMapOf()
 
-    internal suspend fun scheduleTweetRetrieval(jda: JDA) = supervisorScope {
+    internal suspend fun scheduleTweetRetrieval(jda: JDA) = supervisorScope { // call from a more general function
         updateTwitterTaskMap()
         val runningTwitterTaskJobById: MutableMap<Long, Job> = mutableMapOf()
 
@@ -56,7 +56,9 @@ object TaskScheduler {
             var lastPostId: Long? = null
             while (isActive) {
                 try {
-                    val tweets = twitterClient.getTweetsByUrlName(urlName, lastPostId)
+                    val tweets = lastPostId
+                        ?.let { twitterClient.getTweetsByUrlNameSinceLastPostId(urlName, lastPostId!!) }
+                        ?: twitterClient.getLastTweetByUrlName(urlName)
                     postOrDeleteIfNoChannel(tweets, jda, guildId, channelId)
                     tweets.firstOrNull()?.id?.run { lastPostId = this }
                 } catch (e: PenicillinTwitterApiException) {  // handle deleted/changed names
@@ -73,7 +75,7 @@ object TaskScheduler {
             ?.getTextChannelById(channelId)
             ?.run { tweetsSortedByOldest.forEach { sendMessage(it.asTwitterLinkWithStatus).queue() } }
             ?: run {
-                logger.warn { "missing channel, deleting" }
+                logger.warn { "missing channel id: $channelId, deleting record" }
                 twitterRepo.delete(tweets.first().user.screenName, guildId, channelId)
             }
     }

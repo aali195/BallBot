@@ -48,12 +48,13 @@ object TwitterRepositoryImpl : TwitterRepository {
         .runCatching {
             dslContext
                 .insertInto(this)
-                .set(URL_NAME, urlName)
+                .set(URL_NAME, urlName.lowercase())
                 .set(UPDATE_INTERVAL, updateInterval)
                 .apply { description?.let { set(DESCRIPTION, description) } }
                 .set(GUILD_ID, guildId)
                 .set(CHANNEL_ID, channelId)
                 .set(UPLOADER_ID, uploaderId)
+                .onConflictDoNothing()
                 .execute()
         }
         .onFailure { logger.error(it) { "failed to create twitter task record with urlName: $urlName for guildId: $guildId" } }
@@ -74,7 +75,7 @@ object TwitterRepositoryImpl : TwitterRepository {
             dslContext
                 .deleteFrom(this)
                 .where(
-                    URL_NAME.eq(urlName),
+                    URL_NAME.equalIgnoreCase(urlName),
                     GUILD_ID.eq(guildId),
                     UPLOADER_ID.eq(uploaderId)
                 )

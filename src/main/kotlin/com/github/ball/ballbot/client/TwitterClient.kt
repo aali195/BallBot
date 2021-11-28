@@ -30,23 +30,27 @@ object TwitterClient {
         }
     }
 
-    internal suspend fun getTweetsByUrlName(urlName: String, lastPostId: Long?): Set<Status> =
-        lastPostId
-            ?.let {
-                client.timeline.userTimelineByScreenName(
-                    screenName = urlName,
-                    sinceId = it,
-                    includeRTs = false,
-                    excludeReplies = true
-                ).execute().toSet()
-            }
-            ?: let {
-                client.timeline.userTimelineByScreenName(
-                    screenName = urlName,
-                    count = 1,
-                    includeRTs = false,
-                    excludeReplies = true
-                ).execute().toSet()
-            }
+    internal suspend fun getLastTweetByUrlName(urlName: String): Set<Status> =
+        client.timeline
+            .userTimelineByScreenName(
+                screenName = urlName,
+                count = 1,
+                includeRTs = false,
+                excludeReplies = true
+            )
+            .execute()
+            .toSet()
+
+
+    internal suspend fun getTweetsByUrlNameSinceLastPostId(urlName: String, lastPostId: Long): Set<Status> =
+        client.timeline
+            .userTimelineByScreenName(
+                screenName = urlName,
+                sinceId = lastPostId,
+                includeRTs = false,
+                excludeReplies = true
+            )
+            .execute()
+            .toSet()
 
 }

@@ -8,15 +8,15 @@ import org.jooq.DSLContext
 private val logger = KotlinLogging.logger {}
 
 interface PictureRepository {
-    fun insert(name: String, guildId: String, uploaderId: String, url: String, tags: Set<String>): Int?
+    fun insert(name: String, guildId: String, uploaderId: String, urlName: String, tags: Set<String>): Int?
     fun getInfo(name: String, guildId: String): PictureRecord?
     fun getUrl(name: String, guildId: String): String?
-    fun delete(name: String, uploaderId: String): Int? // and guild
-    fun adminDelete(name: String): Int? // and guild
+    fun delete(name: String, guildId: String, uploaderId: String): Int?
+    fun adminDelete(name: String, guildId: String): Int?
     fun getUrlsByTag(tags: List<String>, guildId: String): List<String?>
 }
 
-object PictureRepositoryImpl : PictureRepository { // go over ignore cases
+object PictureRepositoryImpl : PictureRepository {
 
     private val dslContext: DSLContext = DslConfig.dslContext
 
@@ -24,7 +24,7 @@ object PictureRepositoryImpl : PictureRepository { // go over ignore cases
         name: String,
         guildId: String,
         uploaderId: String,
-        url: String,
+        urlName: String,
         tags: Set<String>
     ): Int? = PICTURE
         .runCatching {
@@ -33,8 +33,9 @@ object PictureRepositoryImpl : PictureRepository { // go over ignore cases
                 .set(NAME, name)
                 .set(GUILD_ID, guildId)
                 .set(UPLOADER_ID, uploaderId)
-                .set(URL, url)
-                .set(TAGS, tags.toTypedArray())
+                .set(URL, urlName.lowercase())
+                .set(TAGS, tags.map { it.lowercase() }.toTypedArray())
+                .onConflictDoNothing()
                 .execute()
         }
         .onFailure { logger.error(it) { "failed to create picture record for name: $name guild id: $guildId" } }
@@ -44,7 +45,10 @@ object PictureRepositoryImpl : PictureRepository { // go over ignore cases
         .runCatching {
             dslContext
                 .selectFrom(this)
-                .where(NAME.equalIgnoreCase(name), GUILD_ID.eq(guildId))
+                .where(
+                    NAME.equalIgnoreCase(name),
+                    GUILD_ID.eq(guildId)
+                )
                 .fetchOne()
         }
         .onFailure { logger.error(it) { "failed to find picture record with name: $name for guild id: $guildId" } }
@@ -54,37 +58,50 @@ object PictureRepositoryImpl : PictureRepository { // go over ignore cases
         .runCatching {
             dslContext
                 .selectFrom(this)
-                .where(NAME.equalIgnoreCase(name), GUILD_ID.eq(guildId))
+                .where(
+                    NAME.equalIgnoreCase(name),
+                    GUILD_ID.eq(guildId)
+                )
                 .fetchOne(URL)
         }
         .onFailure { logger.error(it) { "failed to find picture url with name: $name for guild id: $guildId" } }
         .getOrThrow()
 
-    override fun delete(name: String, uploaderId: String): Int? = PICTURE
+    override fun delete(name: String, guildId: String, uploaderId: String): Int? = PICTURE
         .runCatching {
             dslContext
                 .deleteFrom(this)
-                .where(NAME.equalIgnoreCase(name), UPLOADER_ID.eq(uploaderId))
+                .where(
+                    NAME.equalIgnoreCase(name),
+                    GUILD_ID.eq(guildId),
+                    UPLOADER_ID.eq(uploaderId)
+                )
                 .execute()
         }
         .onFailure { logger.error(it) { "failed to delete picture record with name: $name and uploader id: $uploaderId" } }
         .getOrNull()
 
-    override fun adminDelete(name: String): Int? = PICTURE
+    override fun adminDelete(name: String, guildId: String): Int? = PICTURE
         .runCatching {
             dslContext
                 .deleteFrom(this) // guildId
-                .where(NAME.equalIgnoreCase(name))
+                .where(
+                    NAME.equalIgnoreCase(name),
+                    GUILD_ID.eq(guildId)
+                )
                 .execute()
         }
-        .onFailure { logger.error(it) { "failed to admin delete picture record with name: $name" } }
+        .onFailure { logger.error(it) { "failed to admin delete picture record with name: $name for guild id: $guildId" } }
         .getOrNull()
 
     override fun getUrlsByTag(tags: List<String>, guildId: String): List<String?> = PICTURE
         .runCatching {
             dslContext
                 .selectFrom(this)
-                .where(TAGS.contains(tags.toTypedArray()), GUILD_ID.eq(guildId))
+                .where(
+                    TAGS.containsIgnoreCase(tags.toTypedArray()),
+                    GUILD_ID.eq(guildId)
+                )
                 .fetch(URL)
                 .toList()
         }

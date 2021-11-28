@@ -92,16 +92,16 @@ object TwitterCommand : Command() {
     override val usage: String = """
         
         add:
-            `[prefix]twitter add [name in URL] [timing in hours (0.5 minimum)] [optional description (spaces allowed)]`
+            `[prefix]$command add [name in URL] [timing in hours (0.5 minimum)] [optional description (spaces allowed)]`
         get info:
-            `[prefix]twitter info [name in URL]`
+            `[prefix]$command info [name in URL]`
         delete (uploader and admins only):
-            `[prefix]twitter delete [name in URL]`
+            `[prefix]$command delete [name in URL]`
     """.trimIndent()
 
     private fun String.isExistingTwitterUrlName(): Boolean = runBlocking {
         try {
-            twitterClient.getTweetsByUrlName(this@isExistingTwitterUrlName, null)
+            twitterClient.getLastTweetByUrlName(this@isExistingTwitterUrlName)
             true
         } catch (e: Exception) {
             false
@@ -115,7 +115,7 @@ private val URL_NAME_REGEX = "^[a-zA-Z0-9_]+\$".toRegex()
 private fun TwitterScheduleTaskRecord.asInfoMessageEmbed(context: CommandContext) = Embed {
     color = 0xFFFFFF
     field {
-        name = "Url"
+        name = "Url Name"
         value = "https://twitter.com/${this@asInfoMessageEmbed.urlName!!}"
         inline = false
     }
