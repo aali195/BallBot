@@ -29,6 +29,15 @@ object TaskScheduler {
 
     internal suspend fun scheduleTweetRetrieval(jda: JDA) = supervisorScope { // call from a more general function
         updateTwitterTaskMap()
+        twitterTaskById.forEach { (_, jobRecord) ->
+            jda.awaitReady()
+                .guildCache
+                .getElementById(jobRecord.guildId!!)
+                ?.getTextChannelById(jobRecord.channelId!!)
+                ?.sendMessage("⚠️ Bot has redeployed, (re)posting latest tweets ⚠️")
+                ?.queue()
+        }
+
         val runningTwitterTaskJobById: MutableMap<Long, Job> = mutableMapOf()
 
         while (isActive) {
@@ -61,8 +70,17 @@ object TaskScheduler {
                         ?: twitterClient.getLastTweetByUrlName(urlName)
                     postOrDeleteIfNoChannel(tweets, jda, guildId, channelId)
                     tweets.firstOrNull()?.id?.run { lastPostId = this }
-                } catch (e: PenicillinTwitterApiException) {  // handle deleted/changed names
+                } catch (e: PenicillinTwitterApiException) {
                     logger.warn { "problem with the Twitter API request: $e" }
+                    jda.guildCache
+                        .getElementById(guildId)
+                        ?.getTextChannelById(channelId)
+                        ?.run {
+                            sendMessage(
+                                "⚠️ There was a problem trying to find the Tweets of account @${tweetEntry.value!!.urlName}. " +
+                                        "It may have been renamed, deleted or there is an issue with Twitter or this command. ⚠️"
+                            ).queue()
+                        }
                 }
                 delay(updateInterval)
             }

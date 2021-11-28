@@ -57,7 +57,7 @@ object TwitterRepositoryImpl : TwitterRepository {
                 .onConflictDoNothing()
                 .execute()
         }
-        .onFailure { logger.error(it) { "failed to create twitter task record with urlName: $urlName for guildId: $guildId" } }
+        .onFailure { logger.error(it) { "failed to create twitter task record with urlName: $urlName for guildId: $guildId and channelId: $channelId by uploaderId: $uploaderId" } }
         .getOrNull()
 
     override fun getInfo(urlName: String, guildId: String): TwitterScheduleTaskRecord? = TWITTER_SCHEDULE_TASK
@@ -81,7 +81,7 @@ object TwitterRepositoryImpl : TwitterRepository {
                 )
                 .execute()
         }
-        .onFailure { logger.error(it) { "failed to delete twitter task record with urlName: $urlName for guildId: $guildId and uploaderId: $uploaderId" } }
+        .onFailure { logger.error(it) { "failed to delete twitter task record with urlName: $urlName for guildId: $guildId by uploaderId: $uploaderId" } }
         .getOrNull()
 
     override fun adminDelete(urlName: String, guildId: String): Int? = TWITTER_SCHEDULE_TASK
