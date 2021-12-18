@@ -25,7 +25,7 @@ object CommandHandler {
     }
 
     private fun help(context: CommandContext) {
-        context.message.reply(
+        context.message.replyEmbeds(
             Embed {
                 description = "The following are the available commands"
                 color = 0xFFFFFF

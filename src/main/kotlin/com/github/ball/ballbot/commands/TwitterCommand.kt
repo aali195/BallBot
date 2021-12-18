@@ -61,7 +61,7 @@ object TwitterCommand : Command() {
         val urlName = commandArgs.getOrNull(1)
         if (urlName != null) {
             twitterRepo.getInfo(urlName = urlName, guildId = guild.id)
-                ?.run { message.reply(asInfoMessageEmbed(context)).queue() }
+                ?.run { message.replyEmbeds(asInfoMessageEmbed(context)).queue() }
                 ?: reactWithFail()
         } else message.reply("its: $usage").queue()
     }

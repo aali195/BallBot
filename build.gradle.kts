@@ -3,9 +3,9 @@ import java.io.FileInputStream
 import java.util.*
 
 plugins {
-    val kotlinVersion = "1.6.0"
-    val shadowVersion = "7.1.0"
-    val flywayPluginVersion = "8.0.2"
+    val kotlinVersion = "1.6.10"
+    val shadowVersion = "7.1.1"
+    val flywayPluginVersion = "8.1.0"
     val jooqPluginVersion = "6.0.1"
 
     kotlin("jvm") version kotlinVersion
@@ -15,7 +15,7 @@ plugins {
 }
 
 group = "com.github.ball"
-version = "0.2.0"
+version = "0.2.1"
 
 repositories {
     mavenCentral()
@@ -23,17 +23,17 @@ repositories {
     maven("https://jitpack.io/")
 }
 
-val kotlinxCoroutinesVersion = "1.5.2"
-val ktorVersion = "1.6.0"
+val kotlinxCoroutinesVersion = "1.6.0-RC3"
+val ktorVersion = "1.6.6"
 val jdaKtxVersion = "1223d5cbb8a8caac6d28799a36001f1844d7aa7d"
-val jdaVersion = "4.3.0_277"
+val jdaVersion = "4.4.0_350"
 val penicillinVersion = "6.2.1"
 val jacksonKotlinVersion = "2.13.0"
 val postgresqlJdbcVersion = "42.3.1"
-val flywayVersion = "8.0.2"
+val flywayVersion = "8.1.0"
 val hikariVersion = "5.0.0"
-val jooqVersion = "3.15.4"
-val kotlinLoggingVersion = "2.0.11"
+val jooqVersion = "3.15.5"
+val kotlinLoggingVersion = "2.1.16"
 val slf4jSimpleVersion = "1.7.32"
 
 dependencies {

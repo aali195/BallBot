@@ -50,7 +50,7 @@ object PictureCommand : Command() {
         val pictureName = commandArgs.getOrNull(1)
         if (pictureName != null) {
             pictureRepo.getInfo(name = pictureName, guildId = guild.id)
-                ?.run { message.reply(asInfoMessageEmbed(context)).queue() } //doesnt exist too
+                ?.run { message.replyEmbeds(asInfoMessageEmbed(context)).queue() } //doesnt exist too
         } else message.reply("its: $usage").queue()
     }
 

@@ -3,7 +3,7 @@ set -e
 
 # Best to run this via tmux to keep the session running - will probably dockerise the whole thing later so this was a waste of time
 
-APPLICATION_VERSION=${1:-"0.2.0"}
+APPLICATION_VERSION=${1:-"0.2.1"}
 APPLICATION_PATH="build/libs/BallBot-$APPLICATION_VERSION-all.jar"
 
 # Validation
@@ -22,10 +22,10 @@ fi
 # DB setup, don't forget to `docker-compose -f db/docker-compose.yml down` to take down
 echo "Setting up database via docker-compose and sending to background"
 docker-compose -f db/docker-compose.yml up -d
-# Migrations
+# Migrations - May run out of memory...
 echo "============================================"
-echo "Running migrations using flyway via gradlew"
-./gradlew flywayMigrate
+echo "Running migrations using flyway via gradlew (with --no-rebuild option)"
+./gradlew flywayMigrate --no-rebuild
 # Start up
 echo "============================================"
 echo "Running application"
