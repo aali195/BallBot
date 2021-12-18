@@ -38,7 +38,7 @@ object PictureRepositoryImpl : PictureRepository {
                 .onConflictDoNothing()
                 .execute()
         }
-        .onFailure { logger.error(it) { "failed to create picture record for name: $name guild id: $guildId" } }
+        .onFailure { logger.error(it) { "failed to create picture record with name: $name in guild id: $guildId by uploader id: $uploaderId" } }
         .getOrNull()
 
     override fun getInfo(name: String, guildId: String): PictureRecord? = PICTURE
@@ -78,13 +78,13 @@ object PictureRepositoryImpl : PictureRepository {
                 )
                 .execute()
         }
-        .onFailure { logger.error(it) { "failed to delete picture record with name: $name and uploader id: $uploaderId" } }
+        .onFailure { logger.error(it) { "failed to delete picture record with name: $name by uploader id: $uploaderId" } }
         .getOrNull()
 
     override fun adminDelete(name: String, guildId: String): Int? = PICTURE
         .runCatching {
             dslContext
-                .deleteFrom(this) // guildId
+                .deleteFrom(this)
                 .where(
                     NAME.equalIgnoreCase(name),
                     GUILD_ID.eq(guildId)
@@ -99,7 +99,7 @@ object PictureRepositoryImpl : PictureRepository {
             dslContext
                 .selectFrom(this)
                 .where(
-                    TAGS.containsIgnoreCase(tags.toTypedArray()),
+                    TAGS.contains(tags.map { it.lowercase() }.toTypedArray()),
                     GUILD_ID.eq(guildId)
                 )
                 .fetch(URL)
