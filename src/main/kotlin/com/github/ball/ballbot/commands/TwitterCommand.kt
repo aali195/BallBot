@@ -4,7 +4,7 @@ import com.github.ball.ballbot.client.TwitterClient
 import com.github.ball.ballbot.domain.generated.tables.records.TwitterScheduleTaskRecord
 import com.github.ball.ballbot.repository.TwitterRepository
 import com.github.ball.ballbot.repository.TwitterRepositoryImpl
-import com.github.ball.ballbot.scheduler.TaskScheduler
+import com.github.ball.ballbot.scheduler.TwitterScheduler
 import dev.minn.jda.ktx.Embed
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
@@ -51,7 +51,7 @@ object TwitterCommand : Command() {
                 uploaderId = author.id,
             )
             if (result == 1) {
-                TaskScheduler.updateTwitterTaskMap()
+                TwitterScheduler.updateTwitterTaskMap()
                 reactWithComplete()
             } else reactWithFail()
         } else message.reply("its: $usage").queue()
@@ -78,7 +78,7 @@ object TwitterCommand : Command() {
             }
 
             if (result == 1) {
-                TaskScheduler.updateTwitterTaskMap()
+                TwitterScheduler.updateTwitterTaskMap()
                 reactWithComplete()
             } else reactWithFail()
         } else message.reply("its: $usage").queue()

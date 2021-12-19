@@ -19,7 +19,7 @@ import net.dv8tion.jda.api.JDA
 
 private val logger = KotlinLogging.logger {}
 
-object TaskScheduler {
+object TwitterScheduler {
 
     private val twitterRepo: TwitterRepository = TwitterRepositoryImpl
 
@@ -29,14 +29,16 @@ object TaskScheduler {
 
     internal suspend fun scheduleTweetRetrieval(jda: JDA) = supervisorScope { // call from a more general function
         updateTwitterTaskMap()
-        twitterTaskById.forEach { (_, jobRecord) ->
-            jda.awaitReady()
-                .guildCache
-                .getElementById(jobRecord.guildId!!)
-                ?.getTextChannelById(jobRecord.channelId!!)
-                ?.sendMessage("⚠️ Bot has redeployed, (re)posting latest tweets ⚠️")
-                ?.queue()
-        }
+        jda.awaitReady()
+        twitterTaskById.values
+            .distinctBy { it.channelId }
+            .forEach {
+                jda.guildCache
+                    .getElementById(it.guildId!!)
+                    ?.getTextChannelById(it.channelId!!)
+                    ?.sendMessage("⚠️ Bot has redeployed, (re)posting latest tweets ⚠️")
+                    ?.queue()
+            }
 
         val runningTwitterTaskJobById: MutableMap<Long, Job> = mutableMapOf()
 

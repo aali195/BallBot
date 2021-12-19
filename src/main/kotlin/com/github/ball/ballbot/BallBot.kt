@@ -1,7 +1,7 @@
 package com.github.ball.ballbot
 
 import com.github.ball.ballbot.handlers.EventHandler
-import com.github.ball.ballbot.scheduler.TaskScheduler
+import com.github.ball.ballbot.scheduler.TwitterScheduler
 import dev.minn.jda.ktx.light
 import net.dv8tion.jda.api.entities.Activity
 import java.io.File
@@ -15,6 +15,6 @@ suspend fun main() {
         addEventListeners(EventHandler)
     }
 
-    TaskScheduler.scheduleTweetRetrieval(jda)
+    TwitterScheduler.scheduleTweetRetrieval(jda)
 
 }
