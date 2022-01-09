@@ -2,12 +2,18 @@ package com.github.ball.ballbot.commands
 
 import com.github.ball.ballbot.client.TwitterClient
 import com.github.ball.ballbot.domain.generated.tables.records.TwitterScheduleTaskRecord
+import com.github.ball.ballbot.repository.MAX_DISCORD_ALLOWED_ROWS
 import com.github.ball.ballbot.repository.TwitterRepository
 import com.github.ball.ballbot.repository.TwitterRepositoryImpl
 import com.github.ball.ballbot.scheduler.TwitterScheduler
 import dev.minn.jda.ktx.Embed
+import dev.minn.jda.ktx.interactions.SelectionMenu
+import dev.minn.jda.ktx.interactions.option
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
+import net.dv8tion.jda.api.JDA
+import net.dv8tion.jda.api.interactions.components.ActionRow
+import net.dv8tion.jda.api.interactions.components.Button
 import java.time.format.DateTimeFormatter
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
@@ -27,6 +33,7 @@ object TwitterCommand : Command() {
             "add" -> addSubCommand(this)
             "info" -> infoSubCommand(this)
             "delete" -> deleteSubCommand(this)
+            "all" -> allSubCommand(this)
             else -> message.reply("its: $usage").queue()
         }
     }
@@ -61,7 +68,7 @@ object TwitterCommand : Command() {
         val urlName = commandArgs.getOrNull(1)
         if (urlName != null) {
             twitterRepo.getInfo(urlName = urlName, guildId = guild.id)
-                ?.run { message.replyEmbeds(asInfoMessageEmbed(context)).queue() }
+                ?.run { message.replyEmbeds(asInfoMessageEmbed(context.jda)).queue() }
                 ?: reactWithFail()
         } else message.reply("its: $usage").queue()
     }
@@ -84,6 +91,30 @@ object TwitterCommand : Command() {
         } else message.reply("its: $usage").queue()
     }
 
+    private fun allSubCommand(context: CommandContext) = with(context) {
+        val firstPageAccounts = twitterRepo.getFirstPageForGuild(guildId = guild.id)
+        val firstItemValue = firstPageAccounts.firstOrNull()?.urlName
+        val lastItemValue = firstPageAccounts.lastOrNull()?.urlName
+
+        if (firstPageAccounts.isNotEmpty()) {
+            val nextButton = if (firstPageAccounts.size < MAX_DISCORD_ALLOWED_ROWS)
+                Button.primary("Next-disabled", "-").asDisabled()
+            else Button.primary("$TWITTER_SELECTION_BUTTON_NEXT_ID_BASE-$firstItemValue-$lastItemValue", ">")
+
+            message.reply("Select an account url name to view its information or use the buttons to list more")
+                .setActionRows(
+                    ActionRow.of(SelectionMenu("$TWITTER_SELECTION_ID_BASE-$firstItemValue-$lastItemValue") {
+                        firstPageAccounts.forEach { option(it.urlName!!, it.urlName!!) }
+                    }),
+                    ActionRow.of(
+                        Button.primary("Previous-disabled", "-").asDisabled(),
+                        nextButton
+                    )
+                )
+                .queue()
+        } else reactWithFail()
+    }
+
     override val description: String = """
         Retrieves the latest tweets by a Twitter account to create a common timeline feed for the server. 
         Best added to a separate channel made entirely to function as that timeline.
@@ -96,7 +127,9 @@ object TwitterCommand : Command() {
         get info:
             `[prefix]$command info [name in URL]`
         delete (uploader and admins only):
-            `[prefix]$command delete [name in URL]`
+            `[prefix]$command delete [name in URL]`        
+        get info for all guild twitter account follows (embedded and via drop down list):
+            `[prefix]$command all`
     """.trimIndent()
 
     private fun String.isExistingTwitterUrlName(): Boolean = runBlocking {
@@ -110,9 +143,13 @@ object TwitterCommand : Command() {
 
 }
 
+internal val TWITTER_SELECTION_ID_BASE = "${TwitterCommand.command}AllMenu"
+internal val TWITTER_SELECTION_BUTTON_PREVIOUS_ID_BASE = "${TWITTER_SELECTION_ID_BASE}Previous"
+internal val TWITTER_SELECTION_BUTTON_NEXT_ID_BASE = "${TWITTER_SELECTION_ID_BASE}Next"
+
 private val URL_NAME_REGEX = "^[a-zA-Z0-9_]+\$".toRegex()
 
-private fun TwitterScheduleTaskRecord.asInfoMessageEmbed(context: CommandContext) = Embed {
+internal fun TwitterScheduleTaskRecord.asInfoMessageEmbed(jda: JDA) = Embed {
     color = 0xFFFFFF
     field {
         name = "Url Name"
@@ -138,13 +175,12 @@ private fun TwitterScheduleTaskRecord.asInfoMessageEmbed(context: CommandContext
     }
     field {
         name = "Uploader"
-        value = context.jda
-            .retrieveUserById(this@asInfoMessageEmbed.uploaderId!!).complete().name
+        value = jda.retrieveUserById(this@asInfoMessageEmbed.uploaderId!!).complete().name
         inline = false
     }
     field {
         name = "Channel"
-        value = context.jda
+        value = jda
             .getGuildById(guildId!!)
             ?.getGuildChannelById(this@asInfoMessageEmbed.channelId!!)?.name
             ?: "Channel can't be found"

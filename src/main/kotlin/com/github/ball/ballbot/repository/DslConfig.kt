@@ -23,3 +23,5 @@ object DslConfig {
         .let { DSL.using(it.connection, SQLDialect.POSTGRES) }
 
 }
+
+internal const val MAX_DISCORD_ALLOWED_ROWS = 25

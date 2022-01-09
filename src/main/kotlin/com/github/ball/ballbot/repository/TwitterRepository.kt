@@ -21,6 +21,9 @@ interface TwitterRepository {
     fun getInfo(urlName: String, guildId: String): TwitterScheduleTaskRecord?
     fun delete(urlName: String, guildId: String, uploaderId: String): Int?
     fun adminDelete(urlName: String, guildId: String): Int?
+    fun getFirstPageForGuild(guildId: String): Set<TwitterScheduleTaskRecord>
+    fun getPreviousPageForGuild(guildId: String, firstUrlName: String): Set<TwitterScheduleTaskRecord?>
+    fun getNextPageForGuild(guildId: String, lastUrlName: String): Set<TwitterScheduleTaskRecord?>
 }
 
 object TwitterRepositoryImpl : TwitterRepository {
@@ -96,5 +99,52 @@ object TwitterRepositoryImpl : TwitterRepository {
         }
         .onFailure { logger.error(it) { "failed to admin delete twitter task record with urlName: $urlName for guildId: $guildId" } }
         .getOrNull()
+
+    // using keyset pagination
+    override fun getFirstPageForGuild(guildId: String): Set<TwitterScheduleTaskRecord> = TWITTER_SCHEDULE_TASK
+        .runCatching {
+            dslContext
+                .selectFrom(this)
+                .where(GUILD_ID.eq(guildId))
+                .orderBy(URL_NAME)
+                .limit(MAX_DISCORD_ALLOWED_ROWS)
+                .fetch()
+                .toSet()
+        }
+        .onFailure { logger.error(it) { "failed to get first page of twitter records for guild id: $guildId" } }
+        .getOrThrow()
+
+    // using keyset pagination
+    override fun getPreviousPageForGuild(guildId: String, firstUrlName: String): Set<TwitterScheduleTaskRecord?> =
+        TWITTER_SCHEDULE_TASK
+            .runCatching {
+                dslContext
+                    .selectFrom(this)
+                    .where(GUILD_ID.eq(guildId))
+                    .orderBy(URL_NAME.desc()) //seekBefore is broken
+                    .seek(firstUrlName) //seekBefore is broken
+                    .limit(MAX_DISCORD_ALLOWED_ROWS)
+                    .fetch()
+                    .reversed() //seekBefore is broken
+                    .toSet()
+            }
+            .onFailure { logger.error(it) { "failed to get page before id: $firstUrlName of twitter records for guild id: $guildId" } }
+            .getOrThrow()
+
+    // using keyset pagination
+    override fun getNextPageForGuild(guildId: String, lastUrlName: String): Set<TwitterScheduleTaskRecord?> =
+        TWITTER_SCHEDULE_TASK
+            .runCatching {
+                dslContext
+                    .selectFrom(this)
+                    .where(GUILD_ID.eq(guildId))
+                    .orderBy(URL_NAME)
+                    .seekAfter(lastUrlName)
+                    .limit(MAX_DISCORD_ALLOWED_ROWS)
+                    .fetch()
+                    .toSet()
+            }
+            .onFailure { logger.error(it) { "failed to get page after id: $lastUrlName of twitter records for guild id: $guildId" } }
+            .getOrThrow()
 
 }

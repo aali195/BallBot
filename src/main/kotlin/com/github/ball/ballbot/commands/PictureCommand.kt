@@ -1,10 +1,16 @@
 package com.github.ball.ballbot.commands
 
 import com.github.ball.ballbot.domain.generated.tables.records.PictureRecord
+import com.github.ball.ballbot.repository.MAX_DISCORD_ALLOWED_ROWS
 import com.github.ball.ballbot.repository.PictureRepository
 import com.github.ball.ballbot.repository.PictureRepositoryImpl
 import dev.minn.jda.ktx.Embed
+import dev.minn.jda.ktx.interactions.SelectionMenu
+import dev.minn.jda.ktx.interactions.option
 import mu.KotlinLogging
+import net.dv8tion.jda.api.JDA
+import net.dv8tion.jda.api.interactions.components.ActionRow
+import net.dv8tion.jda.api.interactions.components.Button
 import java.time.format.DateTimeFormatter
 
 private val logger = KotlinLogging.logger {}
@@ -22,6 +28,7 @@ object PictureCommand : Command() {
             "info" -> infoSubCommand(this)
             "delete" -> deleteSubCommand(this)
             "tag" -> tagSubCommand(this)
+            "all" -> allSubCommand(this)
             else -> getUrlSubCommand(this)
         }
     }
@@ -50,7 +57,7 @@ object PictureCommand : Command() {
         val pictureName = commandArgs.getOrNull(1)
         if (pictureName != null) {
             pictureRepo.getInfo(name = pictureName, guildId = guild.id)
-                ?.run { message.replyEmbeds(asInfoMessageEmbed(context)).queue() } //doesnt exist too
+                ?.run { message.replyEmbeds(asInfoMessageEmbed(context.jda)).queue() } //doesnt exist too
         } else message.reply("its: $usage").queue()
     }
 
@@ -85,6 +92,27 @@ object PictureCommand : Command() {
             ?: reactWithFail()
     }
 
+    private fun allSubCommand(context: CommandContext) = with(context) {
+        val firstPagePictures = pictureRepo.getFirstPageForGuild(guildId = guild.id)
+        val firstItemValue = firstPagePictures.firstOrNull()?.name
+        val lastItemValue = firstPagePictures.lastOrNull()?.name
+
+        if (firstPagePictures.isNotEmpty()) {
+            val nextButton = if (firstPagePictures.size < MAX_DISCORD_ALLOWED_ROWS)
+                Button.primary("Next-disabled", "-").asDisabled()
+            else Button.primary("$PICTURE_SELECTION_BUTTON_NEXT_ID_BASE-$firstItemValue-$lastItemValue", ">")
+
+            message.reply("Select a picture name to view its information or use the buttons to list more")
+                .setActionRows(
+                    ActionRow.of(SelectionMenu("$PICTURE_SELECTION_ID_BASE-$firstItemValue-$lastItemValue") {
+                        firstPagePictures.forEach { option(it.name!!, it.name!!) }
+                    }),
+                    ActionRow.of(Button.primary("Previous-disabled", "-").asDisabled(), nextButton)
+                )
+                .queue()
+        } else reactWithFail()
+    }
+
     override val description: String = """
         Allows each server to have their own reaction sticker style pictures, each with their own tags
     """.trimIndent()
@@ -102,14 +130,20 @@ object PictureCommand : Command() {
         delete (uploader and admins only):
             `[prefix]$command delete [name]`
         get randomly tagged:
-            `[prefix]$command tag [tag]`
+            `[prefix]$command tag [tag]`        
+        get info for all guild pictures (embedded and via drop down list):
+            `[prefix]$command all`
     """.trimIndent()
 
 }
 
 private val URL_REGEX = "(https?:\\/\\/).*\\.[a-zA-Z0-9]{2,6}\\/*.+".toRegex()
 
-private fun PictureRecord.asInfoMessageEmbed(context: CommandContext) = Embed {
+internal val PICTURE_SELECTION_ID_BASE = "${PictureCommand.command}AllMenu"
+internal val PICTURE_SELECTION_BUTTON_PREVIOUS_ID_BASE = "${PICTURE_SELECTION_ID_BASE}Previous"
+internal val PICTURE_SELECTION_BUTTON_NEXT_ID_BASE = "${PICTURE_SELECTION_ID_BASE}Next"
+
+internal fun PictureRecord.asInfoMessageEmbed(jda: JDA) = Embed {
     color = 0xFFFFFF
     image = this@asInfoMessageEmbed.url!!
     field {
@@ -130,7 +164,7 @@ private fun PictureRecord.asInfoMessageEmbed(context: CommandContext) = Embed {
     }
     field {
         name = "Uploader"
-        value = context.jda.retrieveUserById(this@asInfoMessageEmbed.uploaderId!!)
+        value = jda.retrieveUserById(this@asInfoMessageEmbed.uploaderId!!)
             .complete().name
         inline = false
     }

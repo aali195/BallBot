@@ -1,6 +1,6 @@
 package com.github.ball.ballbot.commands
 
-import com.github.ball.ballbot.handlers.EventHandler
+import com.github.ball.ballbot.handlers.GuildEventHandler
 import com.github.ball.ballbot.repository.GuildRepository
 import com.github.ball.ballbot.repository.GuildRepositoryImpl
 
@@ -16,7 +16,7 @@ object GuildPrefixCommand : Command() {
             ?.run {
                 guildRepo.updateGuildPrefix(guild.id, this)
                 reactWithComplete()
-                EventHandler.updatePrefixMap()
+                GuildEventHandler.updatePrefixMap()
             }
             ?: run { message.reply("its: $usage").queue() }
     }

@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter
 
 private val logger = KotlinLogging.logger {}
 
-object EventHandler : ListenerAdapter() {
+object GuildEventHandler : ListenerAdapter() {
 
     private val guildRepo: GuildRepository = GuildRepositoryImpl
 

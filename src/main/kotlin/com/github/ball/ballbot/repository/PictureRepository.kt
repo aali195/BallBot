@@ -14,6 +14,9 @@ interface PictureRepository {
     fun delete(name: String, guildId: String, uploaderId: String): Int?
     fun adminDelete(name: String, guildId: String): Int?
     fun getUrlsByTag(tags: List<String>, guildId: String): List<String?>
+    fun getFirstPageForGuild(guildId: String): Set<PictureRecord>
+    fun getPreviousPageForGuild(guildId: String, firstPictureName: String): Set<PictureRecord?>
+    fun getNextPageForGuild(guildId: String, lastPictureName: String): Set<PictureRecord?>
 }
 
 object PictureRepositoryImpl : PictureRepository {
@@ -106,6 +109,51 @@ object PictureRepositoryImpl : PictureRepository {
                 .toList()
         }
         .onFailure { logger.error(it) { "failed to get picture urls by tag with tags: $tags and guild id: $guildId" } }
+        .getOrThrow()
+
+    // using keyset pagination
+    override fun getFirstPageForGuild(guildId: String): Set<PictureRecord> = PICTURE
+        .runCatching {
+            dslContext
+                .selectFrom(this)
+                .where(GUILD_ID.eq(guildId))
+                .orderBy(NAME)
+                .limit(MAX_DISCORD_ALLOWED_ROWS)
+                .fetch()
+                .toSet()
+        }
+        .onFailure { logger.error(it) { "failed to get first page of picture records for guild id: $guildId" } }
+        .getOrThrow()
+
+    // using keyset pagination
+    override fun getPreviousPageForGuild(guildId: String, firstPictureName: String): Set<PictureRecord?> = PICTURE
+        .runCatching {
+            dslContext
+                .selectFrom(this)
+                .where(GUILD_ID.eq(guildId))
+                .orderBy(NAME.desc()) //seekBefore is broken
+                .seek(firstPictureName) //seekBefore is broken
+                .limit(MAX_DISCORD_ALLOWED_ROWS)
+                .fetch()
+                .reversed() //seekBefore is broken
+                .toSet()
+        }
+        .onFailure { logger.error(it) { "failed to get page before id: $firstPictureName of picture records for guild id: $guildId" } }
+        .getOrThrow()
+
+    // using keyset pagination
+    override fun getNextPageForGuild(guildId: String, lastPictureName: String): Set<PictureRecord?> = PICTURE
+        .runCatching {
+            dslContext
+                .selectFrom(this)
+                .where(GUILD_ID.eq(guildId))
+                .orderBy(NAME)
+                .seekAfter(lastPictureName)
+                .limit(MAX_DISCORD_ALLOWED_ROWS)
+                .fetch()
+                .toSet()
+        }
+        .onFailure { logger.error(it) { "failed to get page after id: $lastPictureName of picture records for guild id: $guildId" } }
         .getOrThrow()
 
 }
