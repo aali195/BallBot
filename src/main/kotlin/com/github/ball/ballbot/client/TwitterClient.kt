@@ -7,25 +7,18 @@ import blue.starry.penicillin.core.session.config.token
 import blue.starry.penicillin.endpoints.timeline
 import blue.starry.penicillin.endpoints.timeline.userTimelineByScreenName
 import blue.starry.penicillin.models.Status
-import java.io.File
-import java.io.FileInputStream
-import java.util.*
 
 object TwitterClient {
-
-    private val twitterProperties = Properties().apply {
-        load(FileInputStream(File("twitter.properties")))
-    }
 
     private val client = PenicillinClient {
         account {
             application(
-                consumerKey = twitterProperties.getProperty("consumerKey"),
-                consumerSecret = twitterProperties.getProperty("consumerSecret")
+                consumerKey = System.getenv("TWITTER_CONSUMER_KEY"),
+                consumerSecret = System.getenv("TWITTER_CONSUMER_SECRET")
             )
             token(
-                accessToken = twitterProperties.getProperty("accessToken"),
-                accessTokenSecret = twitterProperties.getProperty("accessTokenSecret")
+                accessToken = System.getenv("TWITTER_ACCESS_TOKEN"),
+                accessTokenSecret = System.getenv("TWITTER_ACCESS_TOKEN_SECRET")
             )
         }
     }

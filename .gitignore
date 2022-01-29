@@ -128,6 +128,6 @@ gradle-app.setting
 # gradle/wrapper/gradle-wrapper.properties
 
 ### CUSTOM ###
-token
-db.properties
-twitter.properties
+db/db.properties
+db/db-init.sql
+.env

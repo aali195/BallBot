@@ -15,7 +15,7 @@ plugins {
 }
 
 group = "com.github.ball"
-version = "0.3.0"
+version = "1.0.0"
 
 repositories {
     mavenCentral()
@@ -64,15 +64,15 @@ dependencies {
 val mainPackage = "com.github.ball.ballbot"
 
 val dbProperties = Properties().apply {
-    load(FileInputStream(File(rootProject.rootDir, "db.properties")))
+    load(FileInputStream(File(rootProject.rootDir, "/db/db.properties")))
 }
 
 flyway {
-    driver = dbProperties.getProperty("dbDriver")
-    url = dbProperties.getProperty("dbUrl")
-    user = dbProperties.getProperty("dbUser")
-    password = dbProperties.getProperty("dbPassword")
-    schemas = arrayOf(dbProperties.getProperty("dbSchema"))
+    driver = dbProperties.getProperty("DB_DRIVER")
+    url = dbProperties.getProperty("DB_URL")
+    user = dbProperties.getProperty("DB_USER")
+    password = dbProperties.getProperty("DB_PASSWORD")
+    schemas = arrayOf(dbProperties.getProperty("DB_SCHEMA"))
 }
 
 jooq {

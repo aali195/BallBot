@@ -1,0 +1,47 @@
+version: '3.9'
+services:
+
+  bot:
+    build:
+      context: .
+      args:
+        JAR_FILE: build/libs/BallBot-1.0.0-all.jar
+    environment:
+      - DB_DRIVER=${DB_DRIVER}
+      - DB_URL=${DB_URL}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_SCHEMA=${DB_SCHEMA}
+
+      - DISCORD_TOKEN=${DISCORD_TOKEN_TEST}
+      - TWITTER_CONSUMER_KEY=${TWITTER_CONSUMER_KEY}
+      - TWITTER_CONSUMER_SECRET=${TWITTER_CONSUMER_SECRET}
+      - TWITTER_ACCESS_TOKEN=${TWITTER_ACCESS_TOKEN}
+      - TWITTER_ACCESS_TOKEN_SECRET=${TWITTER_ACCESS_TOKEN_SECRET}
+    depends_on:
+      - flyway
+      - postgres
+
+  flyway:
+    image: flyway/flyway:8.4.3-alpine
+    command: -url=${DB_URL} -schemas=${DB_SCHEMA} -user=${DB_USER} -password=${DB_PASSWORD} -locations=filesystem:/flyway/sql -connectRetries=60 migrate
+    volumes:
+      - ./src/main/resources/db/migration:/flyway/sql
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:14.1-alpine
+    volumes:
+      - ballbot-db:/var/lib/postgresql/data
+      - ./db/db-init.sql:/docker-entrypoint-initdb.d/db-init.sql
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+
+volumes:
+  ballbot-db:
+    driver: local

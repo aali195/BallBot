@@ -4,21 +4,14 @@ import com.zaxxer.hikari.HikariDataSource
 import org.jooq.DSLContext
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
-import java.io.File
-import java.io.FileInputStream
-import java.util.*
 
 object DslConfig {
 
-    private val dbProperties = Properties().apply {
-        load(FileInputStream(File("db.properties")))
-    }
-
     val dslContext: DSLContext = HikariDataSource()
         .apply {
-            jdbcUrl = dbProperties.getProperty("dbUrl")
-            username = dbProperties.getProperty("dbUser")
-            password = dbProperties.getProperty("dbPassword")
+            jdbcUrl = System.getenv("DB_URL")
+            username = System.getenv("DB_USER")
+            password = System.getenv("DB_PASSWORD")
         }
         .let { DSL.using(it.connection, SQLDialect.POSTGRES) }
 
