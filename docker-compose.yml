@@ -5,7 +5,7 @@ services:
     build:
       context: .
       args:
-        JAR_FILE: build/libs/BallBot-1.0.0-all.jar
+        JAR_FILE: build/libs/BallBot-1.1.0-all.jar
     environment:
       - DB_DRIVER=${DB_DRIVER}
       - DB_URL=${DB_URL}
@@ -13,7 +13,7 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_SCHEMA=${DB_SCHEMA}
 
-      - DISCORD_TOKEN=${DISCORD_TOKEN_TEST}
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
       - TWITTER_CONSUMER_KEY=${TWITTER_CONSUMER_KEY}
       - TWITTER_CONSUMER_SECRET=${TWITTER_CONSUMER_SECRET}
       - TWITTER_ACCESS_TOKEN=${TWITTER_ACCESS_TOKEN}

@@ -6,6 +6,7 @@ import com.github.ball.ballbot.repository.MAX_DISCORD_ALLOWED_ROWS
 import com.github.ball.ballbot.repository.TwitterRepository
 import com.github.ball.ballbot.repository.TwitterRepositoryImpl
 import com.github.ball.ballbot.scheduler.TwitterScheduler
+import com.github.ball.ballbot.scheduler.asTwitterLinkWithStatus
 import dev.minn.jda.ktx.Embed
 import dev.minn.jda.ktx.interactions.SelectionMenu
 import dev.minn.jda.ktx.interactions.option
@@ -30,12 +31,31 @@ object TwitterCommand : Command() {
 
     override fun execute(context: CommandContext): Unit = with(context) {
         when (commandArgs.getOrNull(0)) {
+            "get" -> getSubCommand(this)
             "add" -> addSubCommand(this)
             "info" -> infoSubCommand(this)
             "delete" -> deleteSubCommand(this)
             "all" -> allSubCommand(this)
             else -> message.reply("its: $usage").queue()
         }
+    }
+
+    private fun getSubCommand(context: CommandContext) = with(context) {
+        val urlName = commandArgs.getOrNull(1)
+        val count = commandArgs.getOrNull(2)?.toInt() ?: 1
+
+        if (urlName != null) {
+            runBlocking {
+                runCatching { twitterClient.getLastTweetByUrlName(urlName, count) }
+                    .onSuccess { tweets ->
+                        message.reply(tweets.joinToString(separator = "\n") { it.asTwitterLinkWithStatus }).queue()
+                    }
+                    .onFailure {
+                        logger.warn { it.message }
+                        reactWithFail()
+                    }
+            }
+        } else message.reply("its: $usage").queue()
     }
 
     private fun addSubCommand(context: CommandContext) = with(context) {
@@ -124,6 +144,8 @@ object TwitterCommand : Command() {
         
         add:
             `[prefix]$command add [name in URL] [timing in hours (0.5 minimum)] [optional description (spaces allowed)]`
+        get latest posts (count includes latest retweets which are excluded, with 1 as default):
+            `[prefix]$command get [name in URL] (optional count number)`
         get info:
             `[prefix]$command info [name in URL]`
         delete (uploader and admins only):

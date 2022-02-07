@@ -107,5 +107,5 @@ object TwitterScheduler {
 
 }
 
-private val Status.asTwitterLinkWithStatus: String
+internal val Status.asTwitterLinkWithStatus: String
     get() = "https://twitter.com/${this.user.screenName}/status/${this.id}"

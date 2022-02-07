@@ -23,11 +23,11 @@ object TwitterClient {
         }
     }
 
-    internal suspend fun getLastTweetByUrlName(urlName: String): Set<Status> =
+    internal suspend fun getLastTweetByUrlName(urlName: String, count: Int = 1): Set<Status> =
         client.timeline
             .userTimelineByScreenName(
                 screenName = urlName,
-                count = 1,
+                count = count,
                 includeRTs = false,
                 excludeReplies = true
             )
