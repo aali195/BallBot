@@ -4,9 +4,9 @@ import java.util.*
 
 plugins {
     val kotlinVersion = "1.6.10"
-    val shadowVersion = "7.1.1"
-    val flywayPluginVersion = "8.1.0"
-    val jooqPluginVersion = "6.0.1"
+    val shadowVersion = "7.1.2"
+    val flywayPluginVersion = "8.4.4"
+    val jooqPluginVersion = "7.1"
 
     kotlin("jvm") version kotlinVersion
     id("com.github.johnrengelman.shadow") version shadowVersion
@@ -23,18 +23,18 @@ repositories {
     maven("https://jitpack.io/")
 }
 
-val kotlinxCoroutinesVersion = "1.6.0-RC3"
-val ktorVersion = "1.6.6"
+val kotlinxCoroutinesVersion = "1.6.0"
+val ktorVersion = "1.6.7"
 val jdaKtxVersion = "1223d5cbb8a8caac6d28799a36001f1844d7aa7d"
 val jdaVersion = "4.4.0_350"
-val penicillinVersion = "6.2.1"
-val jacksonKotlinVersion = "2.13.0"
+val penicillinVersion = "6.2.2"
+val jacksonKotlinVersion = "2.13.1"
 val postgresqlJdbcVersion = "42.3.1"
-val flywayVersion = "8.1.0"
-val hikariVersion = "5.0.0"
-val jooqVersion = "3.15.5"
-val kotlinLoggingVersion = "2.1.16"
-val slf4jSimpleVersion = "1.7.32"
+val flywayVersion = "8.4.3"
+val hikariVersion = "5.0.1"
+val jooqVersion = "3.16.3"
+val kotlinLoggingVersion = "2.1.21"
+val slf4jSimpleVersion = "1.7.35"
 
 dependencies {
     jooqGenerator("org.postgresql:postgresql:$postgresqlJdbcVersion")
